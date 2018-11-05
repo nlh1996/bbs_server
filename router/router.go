@@ -1,6 +1,7 @@
 package router
 
 import (
+	"bbs_server/controller/thread"
 	"bbs_server/controller/user"
 	"bbs_server/middleware"
 
@@ -15,12 +16,12 @@ func Init() {
 		v1.POST("/login", user.Login)
 		v1.POST("/register", user.Register)
 	}
-	
+
 	v2 := router.Group("/v2")
 	//v2群组使用中间件AuthMiddleWare
 	v2.Use(middleware.AuthMiddleWare())
 	{
-
+		v1.GET("/publish", thread.Publish)
 	}
 	router.Run(":8000")
 }

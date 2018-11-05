@@ -6,11 +6,11 @@ import (
 )
 
 // Jiami 加密
-func Jiami(pwd *string,username *string)(string){
+func Jiami(arg1 *string,arg2 *string)(string){
 	h := md5.New()
-	h.Write([]byte(*pwd))
-	password := fmt.Sprintf("%x", h.Sum(nil))
-	h.Write([]byte(password + *username))
-	password = fmt.Sprintf("%x", h.Sum(nil))
-	return password
+	h.Write([]byte(*arg1))
+	result := fmt.Sprintf("%x", h.Sum(nil))
+	h.Write([]byte(result + *arg2))
+	result = fmt.Sprintf("%x", h.Sum(nil))
+	return result
 }
