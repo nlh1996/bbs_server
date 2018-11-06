@@ -9,7 +9,7 @@ import (
 //Publish 发帖请求
 func Publish(c *gin.Context) {
 	thread := &model.Thread{}
-	if err := c.Bind(thread); err != nil{
+	if err := c.Bind(thread); err != nil {
 
 	}
 

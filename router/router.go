@@ -21,7 +21,7 @@ func Init() {
 	//v2群组使用中间件AuthMiddleWare
 	v2.Use(middleware.AuthMiddleWare())
 	{
-		v1.GET("/publish", thread.Publish)
+		v2.GET("/publish", thread.Publish)
 	}
 	router.Run(":8000")
 }

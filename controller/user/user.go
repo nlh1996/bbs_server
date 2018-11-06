@@ -1,6 +1,7 @@
 package user
 
 import (
+	"bbs_server/common"
 	"bbs_server/model"
 	"bbs_server/utils"
 	"fmt"
@@ -60,16 +61,19 @@ func Login(c *gin.Context) {
 		tokenString, err := token.SignedString([]byte("123"))
 		if err != nil {
 			fmt.Println(err.Error())
-			c.String(http.StatusOK,"内部错误")
+			c.String(http.StatusOK, "内部错误")
 			return
 		}
+		//将用户token加入map缓存中
+		common.TokenMap[tokenString] = user.UserName
+
 		c.JSON(http.StatusOK, gin.H{
 			"data": gin.H{
 				"token": tokenString,
-				"user": user.UserName,
-				"exp": user.Exp,
+				"user":  user.UserName,
+				"exp":   user.Exp,
 			},
-			"msg":  msg,
+			"msg":         msg,
 			"status_code": http.StatusOK,
 		})
 		return
