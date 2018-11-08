@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"bbs_server/common"
 	"net/http"
 
@@ -14,9 +13,8 @@ func AuthMiddleWare() gin.HandlerFunc {
 		header := c.Request.Header["Authorization"]
 		headerToken := header[0]
 
-		user, ok := common.TokenMap[headerToken]
+		_, ok := common.TokenMap[headerToken]
 		if (ok) {
-			fmt.Println(user)
 			c.Next()
 			return
 		}
