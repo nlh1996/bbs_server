@@ -12,6 +12,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Pass .
+// func Pass(c *gin.Context) {
+// 	c.String(http.StatusOK, "access")
+// }
+
 // Register 用户注册
 func Register(c *gin.Context) {
 	user := &model.User{}

@@ -12,6 +12,7 @@ import (
 // Init 初始化路由
 func Init() {
 	router := gin.Default()
+	router.Use(middleware.CrossDomain())
 	v1 := router.Group("/v1")
 	{
 		v1.POST("/login", user.Login)
