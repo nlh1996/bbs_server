@@ -12,10 +12,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Pass .
-// func Pass(c *gin.Context) {
-// 	c.String(http.StatusOK, "access")
-// }
+// IsLoad .
+func IsLoad(c *gin.Context) {
+	header := c.Request.Header["Authorization"]
+	headerToken := header[0]
+	user := &model.User{}
+	name,ok := common.TokenMap[headerToken]
+	if (ok) {
+		user.UserName = name
+		user = user.Search()
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"user":  user.UserName,
+			"exp":   user.Exp,
+			"jifen": user.Integral,
+		},
+	})
+}
 
 // Register 用户注册
 func Register(c *gin.Context) {
@@ -37,13 +51,6 @@ func Register(c *gin.Context) {
 		c.String(http.StatusOK, "1")
 	}
 
-	// cookie := &http.Cookie{
-	// 	Name:     "session_id",
-	// 	Value:    "123",
-	// 	Path:     "/",
-	// 	HttpOnly: true,
-	// }
-	// http.SetCookie(c.Writer, cookie)
 	c.String(http.StatusOK, "Register successful !!!")
 	fmt.Println(*user)
 }
@@ -77,9 +84,9 @@ func Login(c *gin.Context) {
 				"token": tokenString,
 				"user":  user.UserName,
 				"exp":   user.Exp,
+				"jifen": user.Integral,
 			},
 			"msg":         msg,
-			"status_code": http.StatusOK,
 		})
 		return
 	}

@@ -22,7 +22,7 @@ type TopStorey struct {
 	ReadNum     int32     `json:"readNum"`
 	Support     int32     `json:"support"`
 	ReplyNum    int32     `json:"replyNum"`
-	CurrentTime time.Time `json:"createTime"`
+	CreateTime time.Time 	`json:"createTime"`
 	ImgList     []string  `json:"imgList"`
 }
 
@@ -31,7 +31,7 @@ type Reply1 []struct {
 	UID         string    `json:"uid"`
 	Index       int32     `json:"index"`
 	Content     string    `json:"content"`
-	CurrentTime time.Time `json:"createTime"`
+	CreateTime time.Time 	`json:"createTime"`
 }
 
 // Reply2 .
@@ -39,7 +39,7 @@ type Reply2 []struct {
 	UID         string    `json:"uid"`
 	Index       int32     `json:"index"`
 	Content     string    `json:"content"`
-	CurrentTime time.Time `json:"createTime"`
+	CreateTime time.Time 	`json:"createTime"`
 }
 
 // Save .

@@ -13,7 +13,7 @@ func AuthMiddleWare() gin.HandlerFunc {
 		header := c.Request.Header["Authorization"]
 		headerToken := header[0]
 
-		_, ok := common.TokenMap[headerToken]
+		_,ok := common.TokenMap[headerToken]
 		if (ok) {
 			c.Next()
 			return

@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//Publish 发帖请求
+// Publish 发帖请求
 func Publish(c *gin.Context) {
 	thread := &model.Thread{}
 	topStorey := &thread.TopStorey
@@ -20,25 +20,27 @@ func Publish(c *gin.Context) {
 		return
 	}
 
-	topStorey.CurrentTime = time.Now().UTC()
+	topStorey.CreateTime = time.Now()
+	// 将时间格式化为字符串
+	rename := topStorey.CreateTime.Format("20060102150405")
 
-	//图片解码，保存至文件服务器
-	if len(thread.ImgList)!= 0 {
+	// 图片解码，保存至文件服务器
+	if len(thread.ImgList) != 0 {
 		var (
-			enc = base64.StdEncoding
+			enc  = base64.StdEncoding
 			path string
 		)
-		for index,img := range thread.ImgList {
-			if img[11] == 'j'{
+		for index, img := range thread.ImgList {
+			if img[11] == 'j' {
 				img = img[23:]
-				path = fmt.Sprintf("D://image/%d.jpg",index)
-			}else if img[11] == 'p'{
+				path = fmt.Sprintf("D://image/%s%d.jpg", rename, index)
+			} else if img[11] == 'p' {
 				img = img[22:]
-				path = fmt.Sprintf("D://image/%d.png",index)
-			}else if img[11] == 'g'{
+				path = fmt.Sprintf("D://image/%s%d.png", rename, index)
+			} else if img[11] == 'g' {
 				img = img[22:]
-				path = fmt.Sprintf("D://image/%d.gif",index)
-			}else{
+				path = fmt.Sprintf("D://image/%s%d.gif", rename, index)
+			} else {
 				fmt.Println("不支持该文件类型")
 			}
 
@@ -50,9 +52,10 @@ func Publish(c *gin.Context) {
 			f, _ := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModePerm)
 			defer f.Close()
 			f.Write(data)
+			thread.ImgList[index] = path
 		}
 	}
-	
+
 	thread.Save()
 
 	c.JSON(http.StatusOK, gin.H{

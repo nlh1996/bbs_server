@@ -74,3 +74,18 @@ func (t *User) Find() bool {
 	}
 	return false
 }
+
+// Search .
+func (t *User) Search() (*User) {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_user")
+	result := []User{}
+	c.Find(bson.M{}).All(&result)
+	for index := range result {
+		if result[index].UserName == t.UserName {
+			return &result[index]
+		}
+	}
+	return t
+}

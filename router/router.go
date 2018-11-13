@@ -25,6 +25,7 @@ func Init() {
 	v2.Use(middleware.AuthMiddleWare())
 	{
 		v2.POST("/publish", thread.Publish)
+		v2.POST("/isload", user.IsLoad)
 	}
 	router.Run(":8000")
 }
