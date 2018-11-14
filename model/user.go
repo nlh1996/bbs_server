@@ -27,23 +27,23 @@ type User struct {
 
 
 // Save .
-func (t *User) Save() {
+func (pUser *User) Save() {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB("test").C("bbs_user")
-	err := c.Insert(t)
+	err := c.Insert(pUser)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
 // Validator .
-func (t *User) Validator() (string,bool) {
+func (pUser *User) Validator() (string,bool) {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB("test").C("bbs_user")
 	result := User{}
-	err := c.Find(bson.M{"username": t.UserName}).One(&result)
+	err := c.Find(bson.M{"username": pUser.UserName}).One(&result)
 	var msg string 
 
 	if err != nil {
@@ -51,7 +51,7 @@ func (t *User) Validator() (string,bool) {
 		return msg , false
 	}
 
-	if result.PassWord != t.PassWord {
+	if result.PassWord != pUser.PassWord {
 		msg = "密码错误！"
 		return msg , false
 	}
@@ -61,14 +61,14 @@ func (t *User) Validator() (string,bool) {
 }
 
 // Find .
-func (t *User) Find() bool {
+func (pUser *User) Find() bool {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB("test").C("bbs_user")
 	result := []User{}
 	c.Find(bson.M{}).All(&result)
 	for index := range result {
-		if result[index].UserName == t.UserName {
+		if result[index].UserName == pUser.UserName {
 			return true
 		}
 	}
@@ -76,16 +76,16 @@ func (t *User) Find() bool {
 }
 
 // Search .
-func (t *User) Search() (*User) {
+func (pUser *User) Search() (*User) {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB("test").C("bbs_user")
 	result := []User{}
 	c.Find(bson.M{}).All(&result)
 	for index := range result {
-		if result[index].UserName == t.UserName {
+		if result[index].UserName == pUser.UserName {
 			return &result[index]
 		}
 	}
-	return t
+	return pUser
 }

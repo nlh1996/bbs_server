@@ -1,6 +1,7 @@
-package thread
+package post
 
 import (
+	"bbs_server/common"
 	"bbs_server/model"
 	"encoding/base64"
 	"fmt"
@@ -13,8 +14,8 @@ import (
 
 // Publish 发帖请求
 func Publish(c *gin.Context) {
-	thread := &model.Thread{}
-	topStorey := &thread.TopStorey
+	post := &model.Post{}
+	topStorey := &post.TopStorey
 	if err := c.Bind(topStorey); err != nil {
 		fmt.Println(err.Error())
 		return
@@ -25,12 +26,12 @@ func Publish(c *gin.Context) {
 	rename := topStorey.CreateTime.Format("20060102150405")
 
 	// 图片解码，保存至文件服务器
-	if len(thread.ImgList) != 0 {
+	if len(post.ImgList) != 0 {
 		var (
 			enc  = base64.StdEncoding
 			path string
 		)
-		for index, img := range thread.ImgList {
+		for index, img := range post.ImgList {
 			if img[11] == 'j' {
 				img = img[23:]
 				path = fmt.Sprintf("D://image/%s%d.jpg", rename, index)
@@ -48,18 +49,29 @@ func Publish(c *gin.Context) {
 			if err != nil {
 				fmt.Println(err.Error())
 			}
-			//写入新文件
+			//图片写入文件
 			f, _ := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModePerm)
 			defer f.Close()
 			f.Write(data)
-			thread.ImgList[index] = path
+			post.ImgList[index] = path
 		}
 	}
 
-	thread.Save()
+	//记录贴子更新时间
+	post.UpdateTime = topStorey.CreateTime
+	post.Save()
 
 	c.JSON(http.StatusOK, gin.H{
 		"msg":  "success",
-		"data": *thread,
+		"data": *post,
+	})
+}
+
+// GetPosts 获取贴子
+func GetPosts(c *gin.Context) {
+	model.UpdatePosts(common.PostsPool)
+	c.JSON(http.StatusOK, gin.H{
+		"posts": *common.PostsPool,
+		"msg": "scessue",
 	})
 }
