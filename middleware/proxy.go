@@ -11,6 +11,7 @@ func CrossDomain() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//origin := "http://"+c.Request.Host
 		// 设置允许访问的域
+		//c.Header("Access-Control-Allow-Origin", "http://115.159.77.155:3001")
 		c.Header("Access-Control-Allow-Origin", "http://192.168.1.11:3001")
 		// 服务器支持的所有跨域请求的方法,为了避免浏览次请求的多次'预检'请求                                    
 		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE,UPDATE") 

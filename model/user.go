@@ -12,8 +12,8 @@ import (
 type User struct {
 	UserName   string   `json:"username"`
 	PassWord   string   `json:"password"`
-	ReplyNum   string   `json:"replyNum"`
-	SupportNum string   `json:"supportNum"`
+	ReplyNum   int32	  `json:"replyNum"`
+	SupportNum int32    `json:"supportNum"`
 	BrowseNum  string   `json:"browseNum"`
 	Exp        int32    `json:"exp"`
 	Integral   int32    `json:"integral"`

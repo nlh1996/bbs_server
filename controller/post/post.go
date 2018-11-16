@@ -21,9 +21,10 @@ func Publish(c *gin.Context) {
 		return
 	}
 
-	topStorey.CreateTime = time.Now()
+	now := time.Now()
+	topStorey.CreateTime = now.Format("2006-01-02 15:04:05")
 	// 将时间格式化为字符串
-	rename := topStorey.CreateTime.Format("20060102150405")
+	rename := now.Format("20060102150405")
 
 	// 图片解码，保存至文件服务器
 	if len(post.ImgList) != 0 {
@@ -34,13 +35,13 @@ func Publish(c *gin.Context) {
 		for index, img := range post.ImgList {
 			if img[11] == 'j' {
 				img = img[23:]
-				path = fmt.Sprintf("D://image/%s%d.jpg", rename, index)
+				path = fmt.Sprintf("/img/%s%d.jpg", rename, index)
 			} else if img[11] == 'p' {
 				img = img[22:]
-				path = fmt.Sprintf("D://image/%s%d.png", rename, index)
+				path = fmt.Sprintf("/img/%s%d.png", rename, index)
 			} else if img[11] == 'g' {
 				img = img[22:]
-				path = fmt.Sprintf("D://image/%s%d.gif", rename, index)
+				path = fmt.Sprintf("/img/%s%d.gif", rename, index)
 			} else {
 				fmt.Println("不支持该文件类型")
 			}
@@ -53,6 +54,7 @@ func Publish(c *gin.Context) {
 			f, _ := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModePerm)
 			defer f.Close()
 			f.Write(data)
+			path = "http://115.159.77.155:12000" + path 
 			post.ImgList[index] = path
 		}
 	}
@@ -70,8 +72,12 @@ func Publish(c *gin.Context) {
 // GetPosts 获取贴子
 func GetPosts(c *gin.Context) {
 	model.UpdatePosts(common.PostsPool)
+	topStoreys := []model.TopStorey{}
+	for _,value := range *common.PostsPool {
+		topStoreys = append(topStoreys, value.TopStorey)
+	}
 	c.JSON(http.StatusOK, gin.H{
-		"posts": *common.PostsPool,
+		"posts": topStoreys,
 		"msg": "scessue",
 	})
 }
