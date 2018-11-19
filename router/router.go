@@ -19,6 +19,7 @@ func Init() {
 		v1.POST("/register", user.Register)
 		v1.GET("/index", index.GetInfo)
 		v1.GET("/posts", post.GetPosts)
+		v1.GET("/post", post.GetPost)
 	}
 
 	v2 := router.Group("/v2")

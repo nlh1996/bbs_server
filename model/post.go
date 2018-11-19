@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"bbs_server/database"
 	"log"
 
@@ -14,11 +13,13 @@ type Post struct {
 	Reply1     `json:"reply1"`
 	Reply2     `json:"reply2"`
 	UpdateTime string `json:"time"`
+	TID				 string	`json:"tid"`
 }
 
 // TopStorey .
 type TopStorey struct {
 	UID        string    `json:"uid"`
+	TID				 string		 `json:"tid"`
 	Title      string    `json:"title"`
 	Content    string    `json:"content"`
 	ReadNum    int32     `json:"readNum"`
@@ -45,14 +46,16 @@ type Reply2 []struct {
 }
 
 // Save .
-func (t *Post) Save() {
+func (p *Post) Save() bool{
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB("test").C("bbs_posts")
-	err := c.Insert(t)
+	err := c.Insert(p)
 	if err != nil {
 		log.Fatal(err)
+		return false
 	}
+	return true
 }
 
 // UpdatePosts .
@@ -62,6 +65,15 @@ func UpdatePosts(postsPool *[]Post) {
 	c := session.DB("test").C("bbs_posts")
  	err := c.Find(bson.M{}).All(postsPool) 
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	} 
+}
+
+// Get .
+func (p *Post) Get(tid string) {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_posts")
+	c.Find(bson.M{"tid": tid}).One(p)
+
 }
