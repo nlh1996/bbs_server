@@ -28,6 +28,7 @@ func Init() {
 	{
 		v2.POST("/publish", post.Publish)
 		v2.POST("/isload", user.IsLoad)
+		v2.POST("/reply1", post.Reply1)
 	}
 	router.Run(":8000")
 }
