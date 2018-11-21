@@ -12,7 +12,9 @@ import (
 // Init 初始化路由
 func Init() {
 	router := gin.Default()
+	//CrossDomain跨域处理，options请求处理
 	router.Use(middleware.CrossDomain())
+	// v1群组对任何人开放
 	v1 := router.Group("/v1")
 	{
 		v1.POST("/login", user.Login)
@@ -23,7 +25,7 @@ func Init() {
 	}
 
 	v2 := router.Group("/v2")
-	//v2群组使用中间件AuthMiddleWare
+	//v2群组使用中间件AuthMiddleWare，需要token权限才能请求到
 	v2.Use(middleware.AuthMiddleWare())
 	{
 		v2.POST("/publish", post.Publish)

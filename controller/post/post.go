@@ -27,12 +27,12 @@ func Publish(c *gin.Context) {
 	// 帖子的唯一id
 	topStorey.TID = bson.NewObjectId()
 	// 图片解码，保存至文件服务器
-	if len(post.ImgList) != 0 {
+	if len(topStorey.ImgList) != 0 {
 		var (
 			enc  = base64.StdEncoding
 			path string
 		)
-		for index, img := range post.ImgList {
+		for index, img := range topStorey.ImgList {
 			if img[11] == 'j' {
 				img = img[23:]
 				path = fmt.Sprintf("/img/%s%d.jpg", topStorey.TID, index)
@@ -54,16 +54,21 @@ func Publish(c *gin.Context) {
 			f, _ := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModePerm)
 			defer f.Close()
 			f.Write(data)
+			//记录图片保存的地址
 			path = "http://115.159.77.155:12000" + path
-			post.ImgList[index] = path
+			topStorey.ImgList[index] = path
 		}
 	}
 
 	//记录贴子更新时间
 	post.UpdateTime = topStorey.CreateTime
+	//记录帖子的唯一id
 	post.TID = topStorey.TID
+	//将贴子保存到数据库
 	if post.Save() {
 		c.String(http.StatusOK, "success")
+	}else{
+		c.String(http.StatusOK, "未能成功保存")
 	}
 }
 
@@ -84,7 +89,7 @@ func GetPosts(c *gin.Context) {
 func GetPost(c *gin.Context) {
 	post := &model.Post{}
 	tid := c.Query("tid")
-	if result := post.Get(bson.ObjectIdHex(tid)); result {
+	if post.Get(bson.ObjectIdHex(tid)) {
 		c.JSON(http.StatusOK, gin.H{
 			"post": *post,
 			"msg":  "scessue",
@@ -102,12 +107,15 @@ func Reply1(c *gin.Context) {
 		fmt.Println(err.Error())
 		return
 	}
+	reply1.UName = c.Request.Header["Authorization"][0]
 	reply1.CreateTime = utils.GetTimeStr()
-	reply1.RID = bson.NewObjectId()
-	if result := reply1.Save(reply1.TID); result {
-		c.String(http.StatusOK, "ok")
+	reply1.ID = bson.NewObjectId()
+	if reply1.Save(reply1.TID) {
+		c.JSON(http.StatusOK, gin.H{
+			"reply": *reply1,
+		})
 	} else {
-		c.String(http.StatusOK, "error")
+		c.String(http.StatusOK, "内部错误")
 	}
 
 }

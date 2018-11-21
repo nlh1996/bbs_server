@@ -14,14 +14,10 @@ import (
 
 // IsLoad .
 func IsLoad(c *gin.Context) {
-	header := c.Request.Header["Authorization"]
-	headerToken := header[0]
 	user := &model.User{}
-	name,ok := common.TokenMap[headerToken]
-	if (ok) {
-		user.UserName = name
-		user = user.Search()
-	}
+	user.UserName = c.Request.Header["Authorization"][0]
+	user = user.Search()
+	
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
 			"user":  user.UserName,

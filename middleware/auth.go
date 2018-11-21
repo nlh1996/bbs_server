@@ -12,9 +12,9 @@ func AuthMiddleWare() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.Request.Header["Authorization"]
 		headerToken := header[0]
-
-		_,ok := common.TokenMap[headerToken]
+		value,ok := common.TokenMap[headerToken]
 		if (ok) {
+			c.Request.Header["Authorization"][0] = value
 			c.Next()
 			return
 		}

@@ -9,45 +9,59 @@ import (
 
 // Post 贴子结构
 type Post struct {
-	TopStorey  `json:"topStorey"`
-	ReList1    []Reply1      `json:"reList1"`
-	ReList2    []Reply2      `json:"reList2"`
-	UpdateTime string        `json:"time"`
-	TID        bson.ObjectId `json:"tid"`
+	TopStorey  							  `json:"topStorey"`
+	ReList1     []Reply1      `json:"reList1"`
+	ReList2     []Reply2      `json:"reList2"`
+	UpdateTime  string        `json:"time"`
+	TID         bson.ObjectId `json:"tid"`
 }
 
 // TopStorey .
 type TopStorey struct {
-	UID        string        `json:"uid"`
-	TID        bson.ObjectId `json:"tid"`
-	Title      string        `json:"title"`
-	Content    string        `json:"content"`
-	ReadNum    int32         `json:"readNum"`
-	Support    int32         `json:"support"`
-	ReplyNum   int32         `json:"replyNum"`
-	CreateTime string        `json:"createTime"`
-	ImgList    []string      `json:"imgList"`
+	TID         bson.ObjectId `json:"tid"`
+	Title      	string        `json:"title"`
+	ImgList    	[]string      `json:"imgList"`
+	HeadImg			string				`json:"headImg"`
+	UName 			string 				`json:"uName"`
+	CreateTime 	string				`json:"createTime"`
+	Content    	string    		`json:"content"`
+	ReplyNum    uint32        `json:"replyNum"`
+	Support     uint32        `json:"support"`
+	ReadNum     uint32        `json:"readNum"`
 }
 
 // Reply1 .
 type Reply1 struct {
-	UID        string        `json:"uid"`
-	RID        bson.ObjectId `json:"rid"`
-	TID        bson.ObjectId `json:"tid"`
-	Content    string        `json:"content"`
-	CreateTime string        `json:"createTime"`
+	ID        	bson.ObjectId `json:"id"`
+	HeadImg			string				`json:"headImg"`
+	UName 			string 				`json:"uName"`
+	CreateTime 	string				`json:"createTime"`
+	Content    	string    		`json:"content"`
+	TID        	bson.ObjectId `json:"tid"`
 }
 
 // Reply2 .
 type Reply2 struct {
-	UID        string        `json:"uid"`
-	RID        bson.ObjectId `json:"rid"`
-	TID        bson.ObjectId `json:"tid"`
-	Content    string        `json:"content"`
-	CreateTime string        `json:"createTime"`
+	ID        	bson.ObjectId `json:"id"`
+	RID     		bson.ObjectId `json:"rid"`
+	RName 			string 			  `json:"rName"`
+	HeadImg			string				`json:"headImg"`
+	UName 			string 				`json:"uName"`
+	CreateTime 	string				`json:"createTime"`
+	Content    	string    		`json:"content"`
+	TID        	bson.ObjectId `json:"tid"`
 }
 
-// Save .
+// // ShareMsg .
+// type ShareMsg struct {
+// 	HeadImg			string				`json:"headImg"`
+// 	UName 			string 				`json:"uName"`
+// 	CreateTime 	string				`json:"createTime"`
+// 	Content    	string    		`json:"content"`
+// 	TID        	bson.ObjectId `json:"tid"`
+// }
+
+// Save 保存贴子信息.
 func (p *Post) Save() bool {
 	session := database.Session.Clone()
 	defer session.Close()
@@ -60,7 +74,7 @@ func (p *Post) Save() bool {
 	return true
 }
 
-// UpdatePosts .
+// UpdatePosts 获取指定数量贴子.
 func UpdatePosts(postsPool *[]Post) bool {
 	session := database.Session.Clone()
 	defer session.Close()
@@ -73,7 +87,7 @@ func UpdatePosts(postsPool *[]Post) bool {
 	return true
 }
 
-// Get .
+// Get 获取单个贴子详情.
 func (p *Post) Get(tid bson.ObjectId) bool {
 	session := database.Session.Clone()
 	defer session.Close()
@@ -86,12 +100,13 @@ func (p *Post) Get(tid bson.ObjectId) bool {
 	return true
 }
 
-// Save .
+// Save 保存回复信息.
 func (reply1 *Reply1) Save(tid bson.ObjectId) bool {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB("test").C("bbs_posts")
 	err := c.Update(bson.M{"tid": tid}, bson.M{"$push": bson.M{ "relist1": reply1 }})
+	err = c.Update(bson.M{"tid": tid}, bson.M{"$inc": bson.M{ "topstorey.replynum": 1 }})
 	if err != nil {
 		fmt.Println(err)
 		return false
