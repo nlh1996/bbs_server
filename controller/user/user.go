@@ -72,7 +72,7 @@ func Login(c *gin.Context) {
 			c.String(http.StatusOK, "内部错误")
 			return
 		}
-		//将用户token加入map缓存中
+		//将用户token以键值对的方式加入map缓存中
 		common.TokenMap[tokenString] = user.UserName
 
 		c.JSON(http.StatusOK, gin.H{

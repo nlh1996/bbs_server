@@ -74,12 +74,12 @@ func (p *Post) Save() bool {
 	return true
 }
 
-// UpdatePosts 获取指定数量贴子.
+// UpdatePosts 获取所有贴子.
 func UpdatePosts(postsPool *[]Post) bool {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB("test").C("bbs_posts")
-	err := c.Find(bson.M{}).All(postsPool)
+	err := c.Find(bson.M{}).Sort("-_id").All(postsPool)
 	if err != nil {
 		fmt.Println(err)
 		return false
