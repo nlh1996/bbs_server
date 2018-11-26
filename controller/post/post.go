@@ -35,13 +35,13 @@ func Publish(c *gin.Context) {
 		for index, img := range topStorey.ImgList {
 			if img[11] == 'j' {
 				img = img[23:]
-				path = fmt.Sprintf("/img/%s%d.jpg", topStorey.TID, index)
+				path = fmt.Sprintf("/img/%x%d.jpg", string(topStorey.TID), index)
 			} else if img[11] == 'p' {
 				img = img[22:]
-				path = fmt.Sprintf("/img/%s%d.png", topStorey.TID, index)
+				path = fmt.Sprintf("/img/%x%d.png", string(topStorey.TID), index)
 			} else if img[11] == 'g' {
 				img = img[22:]
-				path = fmt.Sprintf("/img/%s%d.gif", topStorey.TID, index)
+				path = fmt.Sprintf("/img/%x%d.gif", string(topStorey.TID), index)
 			} else {
 				fmt.Println("不支持该文件类型")
 			}
@@ -113,6 +113,26 @@ func Reply1(c *gin.Context) {
 	if reply1.Save(reply1.TID) {
 		c.JSON(http.StatusOK, gin.H{
 			"reply": *reply1,
+		})
+	} else {
+		c.String(http.StatusOK, "内部错误")
+	}
+
+}
+
+// Reply2 二级回复
+func Reply2(c *gin.Context) {
+	reply2 := &model.Reply2{}
+	if err := c.Bind(reply2); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	reply2.UName = c.Request.Header["Authorization"][0]
+	reply2.CreateTime = utils.GetTimeStr()
+	reply2.ID = bson.NewObjectId()
+	if reply2.Save(reply2.TID) {
+		c.JSON(http.StatusOK, gin.H{
+			"reply": *reply2,
 		})
 	} else {
 		c.String(http.StatusOK, "内部错误")

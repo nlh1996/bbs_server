@@ -13,14 +13,12 @@ type User struct {
 	UserName   string   `json:"username"`
 	PassWord   string   `json:"password"`
 	ReplyNum   int32	  `json:"replyNum"`
-	SupportNum int32    `json:"supportNum"`
-	BrowseNum  string   `json:"browseNum"`
+	Support    int32    `json:"supportNum"`
 	Exp        int32    `json:"exp"`
 	Integral   int32    `json:"integral"`
 	MyReply    []string `json:"myReply"`
-	MyThread   []string `json:"myThread"`
+	MyPosts    []string `json:"myPosts"`
 	MyCollect  []string `json:"myCollect"`
-
 	// lastLoginAt string
 }
 
