@@ -29,6 +29,7 @@ type TopStorey struct {
 // Reply1 .
 type Reply1 struct {
 	ID        	bson.ObjectId `json:"id"`
+	Show				bool					`json:"show"`
 	ShareMsg 		`bson:",inline"`
 }
 

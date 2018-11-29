@@ -117,7 +117,6 @@ func Reply1(c *gin.Context) {
 	} else {
 		c.String(http.StatusOK, "内部错误")
 	}
-
 }
 
 // Reply2 二级回复

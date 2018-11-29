@@ -13,3 +13,10 @@ func GetTimeStr() (string) {
 	return strTime
 }
 
+// GetDateStr 获取当天日期
+func GetDateStr() (string) {
+	duration,_ := time.ParseDuration("8h")
+	now := time.Now().UTC().Add(duration)
+	strTime := now.Format("2006-01-02")
+	return strTime
+}

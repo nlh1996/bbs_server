@@ -17,12 +17,13 @@ func IsLoad(c *gin.Context) {
 	user := &model.User{}
 	user.UserName = c.Request.Header["Authorization"][0]
 	user = user.Search()
-	
+	isSignin := user.IsSignin()
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
 			"user":  user.UserName,
 			"exp":   user.Exp,
 			"jifen": user.Integral,
+			"isSignin": isSignin,
 		},
 	})
 }
@@ -42,13 +43,10 @@ func Register(c *gin.Context) {
 
 	if user.Find() == false {
 		user.Save()
-		c.String(http.StatusOK, "0")
+		c.String(http.StatusOK, "Register successful !!!")
 	} else {
-		c.String(http.StatusOK, "1")
+		c.String(http.StatusOK, "用户名存在！")
 	}
-
-	c.String(http.StatusOK, "Register successful !!!")
-	fmt.Println(*user)
 }
 
 // Login 用户登录
@@ -61,7 +59,7 @@ func Login(c *gin.Context) {
 	}
 	newPwd := utils.Jiami(&user.PassWord, &user.UserName)
 	user.PassWord = newPwd
-	msg, result := user.Validator()
+	pUser, msg, result := user.Validator()
 	if result {
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"id": user.UserName,
@@ -74,18 +72,28 @@ func Login(c *gin.Context) {
 		}
 		//将用户token以键值对的方式加入map缓存中
 		common.TokenMap[tokenString] = user.UserName
-
+		//是否签到过
+		isSignin := pUser.IsSignin()
 		c.JSON(http.StatusOK, gin.H{
 			"data": gin.H{
 				"token": tokenString,
-				"user":  user.UserName,
-				"exp":   user.Exp,
-				"jifen": user.Integral,
+				"user":  pUser.UserName,
+				"exp":   pUser.Exp,
+				"jifen": pUser.Integral,
+				"isSignin": isSignin,
 			},
 			"msg":         msg,
 		})
 		return
 	}
 	c.String(http.StatusForbidden, msg)
+}
 
+//Signin 用户签到
+func Signin(c *gin.Context) {
+	user := &model.User{}
+	user.UserName = c.Request.Header["Authorization"][0]
+	date := utils.GetDateStr()
+	user.InsertDate(date)
+	c.String(http.StatusOK,"")
 }

@@ -27,7 +27,7 @@ func CrossDomain() gin.HandlerFunc {
 		c.Set("content-type", "application/json")
 		// 预请求回应
 		if c.Request.Method == "OPTIONS" {
-			c.String(http.StatusOK, "access")
+			c.String(http.StatusOK, "")
 		}
 		c.Next()
 		return
