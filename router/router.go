@@ -33,6 +33,7 @@ func Init() {
 		v2.POST("/reply1", post.Reply1)
 		v2.POST("/reply2", post.Reply2)
 		v2.POST("/signin", user.Signin)
+		v2.DELETE("/delpost", post.DelPost)
 	}
 	router.Run(":8000")
 }

@@ -125,3 +125,20 @@ func (reply2 *Reply2) Save(id bson.ObjectId) bool {
 	}
 	return true
 }
+
+// Del 删除贴子
+func (p *Post) Del(tid bson.ObjectId,name string) bool{
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_posts")
+	err := c.Find(bson.M{"tid": tid}).One(p)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	if p.TopStorey.UName == name {
+		c.Remove(bson.M{"tid": tid})
+		return true
+	}
+	return false
+}

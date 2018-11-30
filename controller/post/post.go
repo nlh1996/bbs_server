@@ -136,5 +136,19 @@ func Reply2(c *gin.Context) {
 	} else {
 		c.String(http.StatusOK, "内部错误")
 	}
+}
 
+// DelPost 删除贴子
+func DelPost(c *gin.Context) {
+	name := c.Request.Header["Authorization"][0]
+	post := &model.Post{}
+	if err := c.Bind(post); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	if post.Del(post.TID,name) {
+		c.String(http.StatusOK, "删除成功")
+	} else {
+		c.String(http.StatusOK, "删除失败")
+	}
 }
