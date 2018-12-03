@@ -3,6 +3,7 @@ package model
 import (
 	"bbs_server/database"
 	"bbs_server/utils"
+	"fmt"
 	"log"
 
 	"gopkg.in/mgo.v2/bson"
@@ -11,16 +12,17 @@ import (
 
 // User .
 type User struct {
-	UserName   string   `json:"username"`
+	UName      string   `json:"uName"`
 	PassWord   string   `json:"password"`
-	ReplyNum   int32    `json:"replyNum"`
-	Support    int32    `json:"supportNum"`
-	Exp        int32    `json:"exp"`
-	Integral   int32    `json:"integral"`
+	ReplyNum   uint32   `json:"replyNum"`
+	Support    uint32   `json:"support"`
+	Exp        uint32   `json:"exp"`
+	Integral   uint32   `json:"integral"`
 	SigninTime string   `json:"signinTime"`
 	MyReply    []string `json:"myReply"`
 	MyPosts    []string `json:"myPosts"`
 	MyCollect  []string `json:"myCollect"`
+	MySupport  []string `json:"mySupport"`
 	// lastLoginAt string
 }
 
@@ -41,7 +43,7 @@ func (pUser *User) Validator() (*User, string, bool) {
 	defer session.Close()
 	c := session.DB("test").C("bbs_user")
 	result := &User{}
-	err := c.Find(bson.M{"username": pUser.UserName}).One(result)
+	err := c.Find(bson.M{"uname": pUser.UName}).One(result)
 	var msg string
 	if err != nil {
 		msg = "没有该账户！"
@@ -65,7 +67,7 @@ func (pUser *User) Find() bool {
 	result := []User{}
 	c.Find(bson.M{}).All(&result)
 	for index := range result {
-		if result[index].UserName == pUser.UserName {
+		if result[index].UName == pUser.UName {
 			return true
 		}
 	}
@@ -80,7 +82,7 @@ func (pUser *User) Search() *User {
 	result := []User{}
 	c.Find(bson.M{}).All(&result)
 	for index := range result {
-		if result[index].UserName == pUser.UserName {
+		if result[index].UName == pUser.UName {
 			return &result[index]
 		}
 	}
@@ -100,10 +102,37 @@ func (pUser *User) InsertDate(date string) {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB("test").C("bbs_user")
-	c.Update(bson.M{"username": pUser.UserName}, bson.M{"$inc": bson.M{ "exp": 10 }})
-	c.Update(bson.M{"username": pUser.UserName}, bson.M{"$inc": bson.M{ "integral": 10 }})
-	err := c.Update(bson.M{"username": pUser.UserName}, bson.M{"$set": bson.M{"signintime": date}})
+	c.Update(bson.M{"uname": pUser.UName}, bson.M{"$inc": bson.M{"exp": 10}})
+	c.Update(bson.M{"uname": pUser.UName}, bson.M{"$inc": bson.M{"integral": 10}})
+	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$set": bson.M{"signintime": date}})
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+// SaveSupport 点赞记录贴子id
+func (pUser *User) SaveSupport(tid string) bool {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_user")
+	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$push": bson.M{"mysupport": tid}})
+	if err != nil {
+		fmt.Println("111")
+		return false
+	}
+	return true
+}
+
+// AddSupport 点赞数增加
+func (pUser *User) AddSupport() bool {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_user")
+	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$inc": bson.M{"support": 1}})
+	if err != nil {
+		fmt.Println("222")
+		fmt.Println(err)
+		return false
+	}
+	return true
 }

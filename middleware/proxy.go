@@ -24,7 +24,7 @@ func CrossDomain() gin.HandlerFunc {
 		// 跨域请求是否需要带cookie信息 设置为true
 		c.Header("Access-Control-Allow-Credentials", "true")
 		// 设置返回格式是json
-		c.Set("content-type", "application/json")
+		//c.Set("content-type", "application/json")
 		// 预请求回应
 		if c.Request.Method == "OPTIONS" {
 			c.String(http.StatusOK, "")

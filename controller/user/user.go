@@ -15,14 +15,12 @@ import (
 // IsLoad .
 func IsLoad(c *gin.Context) {
 	user := &model.User{}
-	user.UserName = c.Request.Header["Authorization"][0]
+	user.UName = c.Request.Header["Authorization"][0]
 	user = user.Search()
 	isSignin := user.IsSignin()
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
-			"user":  user.UserName,
-			"exp":   user.Exp,
-			"jifen": user.Integral,
+			"user":  *user,
 			"isSignin": isSignin,
 		},
 	})
@@ -38,7 +36,7 @@ func Register(c *gin.Context) {
 		fmt.Println(err)
 		log.Fatal(err)
 	}
-	newPwd := utils.Jiami(&user.PassWord, &user.UserName)
+	newPwd := utils.Jiami(&user.PassWord, &user.UName)
 	user.PassWord = newPwd
 
 	if user.Find() == false {
@@ -57,12 +55,12 @@ func Login(c *gin.Context) {
 		fmt.Println(err)
 		log.Fatal(err)
 	}
-	newPwd := utils.Jiami(&user.PassWord, &user.UserName)
+	newPwd := utils.Jiami(&user.PassWord, &user.UName)
 	user.PassWord = newPwd
 	pUser, msg, result := user.Validator()
 	if result {
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-			"id": user.UserName,
+			"id": user.UName,
 		})
 		tokenString, err := token.SignedString([]byte("123"))
 		if err != nil {
@@ -71,15 +69,13 @@ func Login(c *gin.Context) {
 			return
 		}
 		//将用户token以键值对的方式加入map缓存中
-		common.TokenMap[tokenString] = user.UserName
+		common.TokenMap[tokenString] = user.UName
 		//是否签到过
 		isSignin := pUser.IsSignin()
 		c.JSON(http.StatusOK, gin.H{
 			"data": gin.H{
 				"token": tokenString,
-				"user":  pUser.UserName,
-				"exp":   pUser.Exp,
-				"jifen": pUser.Integral,
+				"user":  *pUser,
 				"isSignin": isSignin,
 			},
 			"msg":         msg,
@@ -92,7 +88,7 @@ func Login(c *gin.Context) {
 //Signin 用户签到
 func Signin(c *gin.Context) {
 	user := &model.User{}
-	user.UserName = c.Request.Header["Authorization"][0]
+	user.UName = c.Request.Header["Authorization"][0]
 	date := utils.GetDateStr()
 	user.InsertDate(date)
 	c.String(http.StatusOK,"")

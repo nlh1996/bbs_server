@@ -56,8 +56,8 @@ func (p *Post) Save() bool {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB("test").C("bbs_user")
-	c.Update(bson.M{"username": p.TopStorey.UName}, bson.M{"$inc": bson.M{ "exp": 15 }})
-	c.Update(bson.M{"username": p.TopStorey.UName}, bson.M{"$inc": bson.M{ "integral": 15 }})
+	c.Update(bson.M{"uname": p.TopStorey.UName}, bson.M{"$inc": bson.M{ "exp": 15 }})
+	c.Update(bson.M{"uname": p.TopStorey.UName}, bson.M{"$inc": bson.M{ "integral": 15 }})
 	c = session.DB("test").C("bbs_posts")
 	err := c.Insert(p)
 	if err != nil {
@@ -141,4 +141,17 @@ func (p *Post) Del(tid bson.ObjectId,name string) bool{
 		return true
 	}
 	return false
+}
+
+// AddSupport 增加点赞数
+func (p *Post) AddSupport() bool {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_posts")
+	err := c.Update(bson.M{"tid": p.TID}, bson.M{"$inc": bson.M{ "topstorey.support": 1 }})
+	if err != nil {
+		fmt.Println("333")
+		return false
+	}
+	return true
 }
