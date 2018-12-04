@@ -155,7 +155,7 @@ func DelPost(c *gin.Context) {
 
 // Support 点赞行为
 func Support(c *gin.Context) {
-	//点赞用户，记录自己点赞的帖子
+	//点赞用户，记录点赞的帖子
 	name := &model.User{}
 	post := &model.Post{}
 	name.UName = c.Request.Header["Authorization"][0]
@@ -168,4 +168,20 @@ func Support(c *gin.Context) {
 	post.TID = bson.ObjectIdHex(tid)
 	post.AddSupport()
 	c.String(http.StatusOK,"")
+}
+
+// Cancel 取消赞
+func Cancel(c *gin.Context) {
+	//点赞用户，删除点赞的帖子
+	name := &model.User{}
+	post := &model.Post{}
+	name.UName = c.Request.Header["Authorization"][0]
+	tid := c.PostForm("tid")
+	name.CancelSupport(tid)
+	//被点赞用户，减少点赞数
+	name.UName = c.PostForm("name")
+	name.ReduceSupport()
+	//被点赞贴子，减少点赞数
+	post.TID = bson.ObjectIdHex(tid)
+	post.ReduceSupport()
 }

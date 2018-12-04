@@ -117,7 +117,6 @@ func (pUser *User) SaveSupport(tid string) bool {
 	c := session.DB("test").C("bbs_user")
 	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$push": bson.M{"mysupport": tid}})
 	if err != nil {
-		fmt.Println("111")
 		return false
 	}
 	return true
@@ -130,7 +129,31 @@ func (pUser *User) AddSupport() bool {
 	c := session.DB("test").C("bbs_user")
 	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$inc": bson.M{"support": 1}})
 	if err != nil {
-		fmt.Println("222")
+		fmt.Println(err)
+		return false
+	}
+	return true
+}
+
+// CancelSupport 删除点赞记录
+func (pUser *User) CancelSupport(tid string) bool {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_user")
+	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$pull": bson.M{"mysupport": tid}})
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+// ReduceSupport 点赞数减少
+func (pUser *User) ReduceSupport() bool {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_user")
+	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$inc": bson.M{"support": -1}})
+	if err != nil {
 		fmt.Println(err)
 		return false
 	}

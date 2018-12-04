@@ -150,7 +150,18 @@ func (p *Post) AddSupport() bool {
 	c := session.DB("test").C("bbs_posts")
 	err := c.Update(bson.M{"tid": p.TID}, bson.M{"$inc": bson.M{ "topstorey.support": 1 }})
 	if err != nil {
-		fmt.Println("333")
+		return false
+	}
+	return true
+}
+
+// ReduceSupport 减少点赞数
+func (p *Post) ReduceSupport() bool {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_posts")
+	err := c.Update(bson.M{"tid": p.TID}, bson.M{"$inc": bson.M{ "topstorey.support": -1 }})
+	if err != nil {
 		return false
 	}
 	return true
