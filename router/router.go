@@ -1,6 +1,7 @@
 package router
 
 import (
+	"bbs_server/controller/admin"
 	"bbs_server/controller/index"
 	"bbs_server/controller/post"
 	"bbs_server/controller/user"
@@ -22,6 +23,7 @@ func Init() {
 		v1.GET("/index", index.GetInfo)
 		v1.GET("/posts", post.GetPosts)
 		v1.GET("/post", post.GetPost)
+		v1.POST("/admin", admin.Login)
 	}
 
 	v2 := router.Group("/v2")
@@ -37,5 +39,12 @@ func Init() {
 		v2.POST("/support", post.Support)
 		v2.POST("/cancel", post.Cancel)
 	}
+
+	adminAPI := router.Group("/admin")
+	adminAPI.Use(middleware.AuthAdmin())
+	{
+		
+	}
+
 	router.Run(":8000")
 }

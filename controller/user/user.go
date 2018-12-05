@@ -16,12 +16,20 @@ import (
 func IsLoad(c *gin.Context) {
 	user := &model.User{}
 	user.UName = c.Request.Header["Authorization"][0]
+	var isLoad int8
+	if user.UName == "admin" {
+		isLoad = 2
+	}else{
+		isLoad = 1
+	}
+
 	user = user.Search()
 	isSignin := user.IsSignin()
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
 			"user":  *user,
 			"isSignin": isSignin,
+			"isLoad": isLoad,
 		},
 	})
 }
@@ -77,6 +85,7 @@ func Login(c *gin.Context) {
 				"token": tokenString,
 				"user":  *pUser,
 				"isSignin": isSignin,
+				"isLoad": 1,
 			},
 			"msg":         msg,
 		})
