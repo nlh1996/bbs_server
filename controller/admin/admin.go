@@ -12,8 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Login .
-// Login 用户登录
+// Login 管理员登录
 func Login(c *gin.Context) {
 	admin := &model.Admin{}
 	err := c.Bind(admin)
@@ -39,11 +38,23 @@ func Login(c *gin.Context) {
 
 		c.JSON(http.StatusOK, gin.H{
 			"data": gin.H{
-				"token":    tokenString,
+				"token": tokenString,
 			},
 			"msg": msg,
 		})
 		return
 	}
 	c.String(http.StatusForbidden, msg)
+}
+
+// Count 用户统计。
+func Count(c *gin.Context) {
+	msg := &model.TodayMsg{}
+	msg.Today = utils.GetDateStr()
+	msg = msg.Search()
+	num := msg.Count()
+	c.JSON(http.StatusOK, gin.H{
+		"count": *msg,
+		"userNum": num,
+	})
 }

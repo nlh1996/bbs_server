@@ -19,7 +19,7 @@ func IsLoad(c *gin.Context) {
 	var isLoad int8
 	if user.UName == "admin" {
 		isLoad = 2
-	}else{
+	} else {
 		isLoad = 1
 	}
 
@@ -27,9 +27,9 @@ func IsLoad(c *gin.Context) {
 	isSignin := user.IsSignin()
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
-			"user":  *user,
+			"user":     *user,
 			"isSignin": isSignin,
-			"isLoad": isLoad,
+			"isLoad":   isLoad,
 		},
 	})
 }
@@ -49,6 +49,10 @@ func Register(c *gin.Context) {
 
 	if user.Find() == false {
 		user.Save()
+		//统计每天用户注册数量
+		msg := &model.TodayMsg{}
+		msg.Today = utils.GetDateStr()
+		msg.RegisterSave()
 		c.String(http.StatusOK, "Register successful !!!")
 	} else {
 		c.String(http.StatusOK, "用户名存在！")
@@ -67,6 +71,11 @@ func Login(c *gin.Context) {
 	user.PassWord = newPwd
 	pUser, msg, result := user.Validator()
 	if result {
+		//统计每天用户登录情况
+		msg := &model.TodayMsg{}
+		msg.Today = utils.GetDateStr()
+		msg.LoginSave()
+		//返回token给用户
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"id": user.UName,
 		})
@@ -82,12 +91,12 @@ func Login(c *gin.Context) {
 		isSignin := pUser.IsSignin()
 		c.JSON(http.StatusOK, gin.H{
 			"data": gin.H{
-				"token": tokenString,
-				"user":  *pUser,
+				"token":    tokenString,
+				"user":     *pUser,
 				"isSignin": isSignin,
-				"isLoad": 1,
+				"isLoad":   1,
 			},
-			"msg":         msg,
+			"msg": msg,
 		})
 		return
 	}
@@ -100,5 +109,5 @@ func Signin(c *gin.Context) {
 	user.UName = c.Request.Header["Authorization"][0]
 	date := utils.GetDateStr()
 	user.InsertDate(date)
-	c.String(http.StatusOK,"")
+	c.String(http.StatusOK, "")
 }

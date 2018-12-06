@@ -43,7 +43,7 @@ func Init() {
 	adminAPI := router.Group("/admin")
 	adminAPI.Use(middleware.AuthAdmin())
 	{
-		
+		adminAPI.POST("/count", admin.Count)
 	}
 
 	router.Run(":8000")
