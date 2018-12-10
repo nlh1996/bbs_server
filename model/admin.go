@@ -21,6 +21,12 @@ type TodayMsg struct {
 	TodayRegister uint32
 }
 
+// BlackName 黑名
+type BlackName struct {
+	UName string
+	Time  string
+}
+
 // Validator .
 func (admin *Admin) Validator() (string, bool) {
 	session := database.Session.Clone()
@@ -104,10 +110,56 @@ func (msg *TodayMsg) Count() int {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB("test").C("bbs_user")
-	num,err:= c.Find(nil).Count()
+	num, err := c.Find(nil).Count()
 	if err != nil {
 		log.Fatal(err)
 		return 0
 	}
 	return num
+}
+
+// BlackNameSave 保存至黑名单
+func (p *BlackName) BlackNameSave() bool {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_blacklist")
+	result := []BlackName{}
+	c.Find(bson.M{}).All(&result)
+	for index := range result {
+		if result[index].UName == p.UName {
+			return false
+		}
+	}
+	err := c.Insert(p)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return true
+}
+
+// BlackNameRemove 从黑名单中移出
+func (p *BlackName) BlackNameRemove() bool {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_blacklist")
+	err := c.Remove(bson.M{"uname": p.UName})
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+	return true
+}
+
+// BlackList 获取黑名单
+func (p *BlackName) BlackList() *[]BlackName {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_blacklist")
+	list := &[]BlackName{}
+	err := c.Find(bson.M{}).All(list)
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+	return list
 }

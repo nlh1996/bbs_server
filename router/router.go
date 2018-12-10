@@ -39,11 +39,15 @@ func Init() {
 		v2.POST("/support", post.Support)
 		v2.POST("/cancel", post.Cancel)
 	}
-
+	// 管理员路由组（管理员请求）
 	adminAPI := router.Group("/admin")
 	adminAPI.Use(middleware.AuthAdmin())
 	{
 		adminAPI.POST("/count", admin.Count)
+		adminAPI.POST("/search", admin.UserSearch)
+		adminAPI.POST("/addBlackList", admin.AddBlackList)
+		adminAPI.POST("/removeBlackList", admin.RemoveBlackList)
+		adminAPI.POST("/getBlackList", admin.GetBlackList)
 	}
 
 	router.Run(":8000")

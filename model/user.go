@@ -18,6 +18,7 @@ type User struct {
 	Support    uint32   `json:"support"`
 	Exp        uint32   `json:"exp"`
 	Integral   uint32   `json:"integral"`
+	CreateTime string		`json:"createTime"`
 	SigninTime string   `json:"signinTime"`
 	MyReply    []string `json:"myReply"`
 	MyPosts    []string `json:"myPosts"`
