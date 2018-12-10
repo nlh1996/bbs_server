@@ -22,16 +22,20 @@ func IsLoad(c *gin.Context) {
 	} else {
 		isLoad = 1
 	}
-
-	user = user.Search()
+	var result bool
+	result,user = user.Search()
 	isSignin := user.IsSignin()
-	c.JSON(http.StatusOK, gin.H{
-		"data": gin.H{
-			"user":     *user,
-			"isSignin": isSignin,
-			"isLoad":   isLoad,
-		},
-	})
+	if result {
+		c.JSON(http.StatusOK, gin.H{
+			"data": gin.H{
+				"user":     *user,
+				"isSignin": isSignin,
+				"isLoad":   isLoad,
+			},
+		})
+	}else{
+		c.String(http.StatusOK,"内部错误！")
+	}
 }
 
 // Register 用户注册

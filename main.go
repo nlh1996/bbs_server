@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"bbs_server/common"
 	"bbs_server/database"
 	"bbs_server/model"
@@ -9,7 +8,6 @@ import (
 )
 
 func main() {
-	fmt.Println("111")
 	database.InitDB()
 	//获取黑名单
 	blackName := &model.BlackName{}

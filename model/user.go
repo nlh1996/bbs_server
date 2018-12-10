@@ -76,18 +76,16 @@ func (pUser *User) Find() bool {
 }
 
 // Search .
-func (pUser *User) Search() *User {
+func (pUser *User) Search() (bool,*User) {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB("test").C("bbs_user")
-	result := []User{}
-	c.Find(bson.M{}).All(&result)
-	for index := range result {
-		if result[index].UName == pUser.UName {
-			return &result[index]
-		}
+	result := &User{}
+	err := c.Find(bson.M{"uname": pUser.UName}).One(result)
+	if err != nil {
+		return false,nil
 	}
-	return pUser
+	return true,result
 }
 
 // IsSignin 判断是否签到

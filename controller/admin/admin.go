@@ -64,13 +64,19 @@ func Count(c *gin.Context) {
 func UserSearch (c *gin.Context) {
 	user := &model.User{}
 	user.UName = c.PostForm("name")
-	user = user.Search()
-	c.JSON(http.StatusOK, gin.H{
-		"name": user.UName,
-		"level": user.Exp,
-		"jifen": user.Integral,
-		"time": user.CreateTime,
-	})
+	var result bool
+	result,user = user.Search()
+	if result {
+		c.JSON(http.StatusOK, gin.H{
+			"name": user.UName,
+			"level": user.Exp,
+			"jifen": user.Integral,
+			"time": user.CreateTime,
+		})
+	}else{
+		c.String(http.StatusOK,"没有该用户！")
+	}
+
 }
 
 // AddBlackList 加入黑名单
