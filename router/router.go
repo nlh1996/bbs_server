@@ -2,6 +2,7 @@ package router
 
 import (
 	"bbs_server/controller/admin"
+	"bbs_server/controller/feedback"
 	"bbs_server/controller/index"
 	"bbs_server/controller/post"
 	"bbs_server/controller/user"
@@ -38,6 +39,7 @@ func Init() {
 		v2.DELETE("/delpost", post.DelPost)
 		v2.POST("/support", post.Support)
 		v2.POST("/cancel", post.Cancel)
+		v2.POST("/complaint", feedback.Complaint)
 	}
 	// 管理员路由组（管理员请求）
 	adminAPI := router.Group("/admin")

@@ -136,7 +136,7 @@ func (p *Post) Del(tid bson.ObjectId,name string) bool{
 		fmt.Println(err)
 		return false
 	}
-	if p.TopStorey.UName == name {
+	if p.TopStorey.UName == name || name == "admin" {
 		c.Remove(bson.M{"tid": tid})
 		return true
 	}

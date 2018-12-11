@@ -185,3 +185,4 @@ func Cancel(c *gin.Context) {
 	post.TID = bson.ObjectIdHex(tid)
 	post.ReduceSupport()
 }
+
