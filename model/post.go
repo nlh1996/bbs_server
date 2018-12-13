@@ -138,6 +138,8 @@ func (p *Post) Del(tid bson.ObjectId,name string) bool{
 	}
 	if p.TopStorey.UName == name || name == "admin" {
 		c.Remove(bson.M{"tid": tid})
+		c = session.DB("test").C("bbs_feedback")
+		c.Remove(bson.M{"tid": tid})
 		return true
 	}
 	return false

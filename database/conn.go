@@ -5,8 +5,10 @@ import (
 )
 
 // Session .
-var Session *mgo.Session
-var err error
+var (
+	Session *mgo.Session
+	err error
+)
 
 // InitDB 初始化数据库连接.
 func InitDB() {

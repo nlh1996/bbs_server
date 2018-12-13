@@ -50,6 +50,10 @@ func Init() {
 		adminAPI.POST("/addBlackList", admin.AddBlackList)
 		adminAPI.POST("/removeBlackList", admin.RemoveBlackList)
 		adminAPI.POST("/getBlackList", admin.GetBlackList)
+		adminAPI.POST("/getFeedList0", admin.GetFeedList0)
+		adminAPI.POST("/getFeedList1", admin.GetFeedList1)
+		adminAPI.POST("/delFeedBack", admin.DelFeedBack)
+		adminAPI.POST("/agreeFeedBack", admin.AgreeFeedBack)
 	}
 
 	router.Run(":8000")

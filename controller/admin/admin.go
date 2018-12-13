@@ -59,7 +59,6 @@ func Count(c *gin.Context) {
 	})
 }
 
-
 // UserSearch 用户搜索。
 func UserSearch (c *gin.Context) {
 	user := &model.User{}
@@ -74,9 +73,8 @@ func UserSearch (c *gin.Context) {
 			"time": user.CreateTime,
 		})
 	}else{
-		c.String(http.StatusOK,"没有该用户！")
+		c.String(http.StatusNoContent,"没有该用户！")
 	}
-
 }
 
 // AddBlackList 加入黑名单
@@ -113,4 +111,46 @@ func GetBlackList(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"list": list,
 	})
+}
+
+// GetFeedList0 获取未处理的用户反馈信息
+func GetFeedList0(c *gin.Context) {
+	msg := &model.Complaint{}
+	list := msg.FeedList0()
+	c.JSON(http.StatusOK, gin.H{
+		"list": list,
+	})
+}
+
+// GetFeedList1 获取未处理的用户反馈信息
+func GetFeedList1(c *gin.Context) {
+	msg := &model.Complaint{}
+	list := msg.FeedList1()
+	c.JSON(http.StatusOK, gin.H{
+		"list": list,
+	})
+}
+
+// DelFeedBack 删除用户反馈信息
+func DelFeedBack(c *gin.Context) {
+	tid := c.PostForm("tid")
+	feedBack := &model.Complaint{}
+	result := feedBack.Del(tid) 
+	if result {
+		c.String(http.StatusOK, "ok")
+	}else{
+		c.String(http.StatusNoContent, "")
+	}
+}
+
+// AgreeFeedBack 同意用户反馈信息
+func AgreeFeedBack(c *gin.Context) {
+	tid := c.PostForm("tid")
+	feedBack := &model.Complaint{}
+	result := feedBack.Agree(tid) 
+	if result {
+		c.String(http.StatusOK, "ok")
+	}else{
+		c.String(http.StatusNoContent, "")
+	}
 }
