@@ -130,3 +130,12 @@ func GetNotice(c *gin.Context) {
 		"msg": result.Message,
 	})
 }
+
+// GetZhiDing 获取置顶帖
+func GetZhiDing(c *gin.Context) {
+	headPost := &model.HeadPost{}
+	result := headPost.GetHeadPost()
+	c.JSON(http.StatusOK,gin.H{
+		"list": result,
+	})
+}

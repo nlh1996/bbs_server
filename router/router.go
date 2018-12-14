@@ -26,6 +26,7 @@ func Init() {
 		v1.GET("/post", post.GetPost)
 		v1.POST("/admin", admin.Login)
 		v1.GET("/notices/get", user.GetNotice)
+		v1.GET("/zhiding/get", user.GetZhiDing)
 	}
 
 	v2 := router.Group("/v2")

@@ -146,6 +146,8 @@ func (p *Post) Del(tid bson.ObjectId,name string) bool{
 		c.Remove(bson.M{"tid": tid})
 		c = session.DB("test").C("bbs_feedback")
 		c.Remove(bson.M{"tid": tid})
+		c = session.DB("test").C("bbs_zhiding")
+		c.Remove(bson.M{"tid": tid})
 		return true
 	}
 	return false
@@ -195,4 +197,17 @@ func (p *Post) AgreeZhiDIng(tid string) bool {
 		c.Insert(headPost)
 	}
 	return true
+}
+
+// GetHeadPost 获取置顶帖子
+func (p *HeadPost) GetHeadPost() *[]HeadPost {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_zhiding")
+	result := &[]HeadPost{}
+	err := c.Find(nil).Sort("-_id").Limit(3).All(result)
+	if err != nil {
+		return nil
+	}
+	return result	
 }
