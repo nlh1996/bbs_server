@@ -30,6 +30,7 @@ type TopStorey struct {
 type Reply1 struct {
 	ID        	bson.ObjectId `json:"id"`
 	Show				bool					`json:"show"`
+	RName 			string 			  `json:"rName"`
 	ShareMsg 		`bson:",inline"`
 }
 
@@ -96,6 +97,8 @@ func (p *Post) Get(tid bson.ObjectId) bool {
 		fmt.Println(err)
 		return false
 	}
+	c = session.DB("test").C("bbs_user")
+	c.Update(bson.M{"uname": p.TopStorey.UName}, bson.M{"$inc": bson.M{ "readnum": 1 }})
 	return true
 }
 
@@ -104,8 +107,9 @@ func (reply1 *Reply1) Save(tid bson.ObjectId) bool {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB("test").C("bbs_user")
-	c.Update(bson.M{"username": reply1.UName}, bson.M{"$inc": bson.M{ "exp": 5 }})
-	c.Update(bson.M{"username": reply1.UName}, bson.M{"$inc": bson.M{ "integral": 5 }})
+	c.Update(bson.M{"uname": reply1.UName}, bson.M{"$inc": bson.M{ "exp": 5 }})
+	c.Update(bson.M{"uname": reply1.UName}, bson.M{"$inc": bson.M{ "integral": 5 }})
+	c.Update(bson.M{"uname": reply1.RName}, bson.M{"$inc": bson.M{ "replynum": 1 }})
 	c = session.DB("test").C("bbs_posts")
 	err := c.Update(bson.M{"tid": tid}, bson.M{"$push": bson.M{ "relist1": reply1 }})
 	err = c.Update(bson.M{"tid": tid}, bson.M{"$inc": bson.M{ "topstorey.replynum": 1 }})
@@ -121,8 +125,9 @@ func (reply2 *Reply2) Save(id bson.ObjectId) bool {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB("test").C("bbs_user")
-	c.Update(bson.M{"username": reply2.UName}, bson.M{"$inc": bson.M{ "exp": 5 }})
-	c.Update(bson.M{"username": reply2.UName}, bson.M{"$inc": bson.M{ "integral": 5 }})
+	c.Update(bson.M{"uname": reply2.UName}, bson.M{"$inc": bson.M{ "exp": 5 }})
+	c.Update(bson.M{"uname": reply2.UName}, bson.M{"$inc": bson.M{ "integral": 5 }})
+	c.Update(bson.M{"uname": reply2.RName}, bson.M{"$inc": bson.M{ "replynum": 1 }})
 	c = session.DB("test").C("bbs_posts")
 	err := c.Update(bson.M{"tid": id}, bson.M{"$push": bson.M{ "relist2": reply2 }})
 	if err != nil {

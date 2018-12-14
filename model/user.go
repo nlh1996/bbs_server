@@ -15,6 +15,7 @@ type User struct {
 	UName      string   `json:"uName"`
 	PassWord   string   `json:"password"`
 	ReplyNum   uint32   `json:"replyNum"`
+	ReadNum		 uint32 	`json:"readNum"`
 	Support    uint32   `json:"support"`
 	Exp        uint32   `json:"exp"`
 	Integral   uint32   `json:"integral"`
