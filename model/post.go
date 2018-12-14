@@ -51,6 +51,12 @@ type ShareMsg struct {
 	TID        	bson.ObjectId `json:"tid"`
 }
 
+// HeadPost 置顶帖
+type HeadPost struct {
+	TID        	bson.ObjectId `json:"tid"`
+	Title      	string        `json:"title"`	
+}
+
 // Save 保存贴子信息.
 func (p *Post) Save() bool {
 	session := database.Session.Clone()
@@ -165,6 +171,28 @@ func (p *Post) ReduceSupport() bool {
 	err := c.Update(bson.M{"tid": p.TID}, bson.M{"$inc": bson.M{ "topstorey.support": -1 }})
 	if err != nil {
 		return false
+	}
+	return true
+}
+
+// AgreeZhiDIng 同意贴子置顶
+func (p *Post) AgreeZhiDIng(tid string) bool {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_feedback")
+	id := bson.ObjectIdHex(tid)
+	_,err := c.UpdateAll(bson.M{"tid": id}, bson.M{"$set": bson.M{"status": 1}})
+	if err != nil {
+		return false
+	}
+	p.Get(id)
+	c = session.DB("test").C("bbs_zhiding")
+	headPost := &HeadPost{}
+	err2 := c.Find(bson.M{"tid": id}).One(headPost)
+	if err2 != nil {
+		headPost.TID = p.TID
+		headPost.Title = p.Title
+		c.Insert(headPost)
 	}
 	return true
 }

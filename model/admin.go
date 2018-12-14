@@ -27,6 +27,12 @@ type BlackName struct {
 	Time  string
 }
 
+// Notice 公告
+type Notice struct {
+	Message    string 			 	`json:"msg"`
+	Createtime string
+}
+
 // Validator .
 func (admin *Admin) Validator() (string, bool) {
 	session := database.Session.Clone()
@@ -162,4 +168,30 @@ func (p *BlackName) BlackList() *[]BlackName {
 		return nil
 	}
 	return list
+}
+
+// Save 保存公告信息
+func (p *Notice) Save() bool{
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_notices")
+	err := c.Insert(p)
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+	return true
+}
+
+// Get 获取公告信息
+func (p *Notice) Get() *Notice{
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB("test").C("bbs_notices")
+	err := c.Find(nil).Sort("-_id").One(p)
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+	return p
 }

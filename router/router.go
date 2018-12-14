@@ -25,6 +25,7 @@ func Init() {
 		v1.GET("/posts", post.GetPosts)
 		v1.GET("/post", post.GetPost)
 		v1.POST("/admin", admin.Login)
+		v1.GET("/notices/get", user.GetNotice)
 	}
 
 	v2 := router.Group("/v2")
@@ -54,6 +55,8 @@ func Init() {
 		adminAPI.POST("/getFeedList1", admin.GetFeedList1)
 		adminAPI.POST("/delFeedBack", admin.DelFeedBack)
 		adminAPI.POST("/agreeFeedBack", admin.AgreeFeedBack)
+		adminAPI.POST("/notices/save", admin.AddNotice)
+		adminAPI.POST("/zhiding", admin.ZhiDing)
 	}
 
 	router.Run(":8000")

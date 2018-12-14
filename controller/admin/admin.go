@@ -154,3 +154,31 @@ func AgreeFeedBack(c *gin.Context) {
 		c.String(http.StatusNoContent, "")
 	}
 }
+
+// ZhiDing 同意贴子置顶
+func ZhiDing(c *gin.Context) {
+	tid := c.PostForm("tid")
+	post := &model.Post{}
+	result := post.AgreeZhiDIng(tid) 
+	if result {
+		c.String(http.StatusOK, "ok")
+	}else{
+		c.String(http.StatusNoContent, "")
+	}
+}
+
+// AddNotice 添加公告
+func AddNotice(c *gin.Context) {
+	notice := &model.Notice{}
+	notice.Createtime = utils.GetTimeStr()
+	if err := c.Bind(notice); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	result := notice.Save() 
+	if(result) {
+		c.String(http.StatusOK,"ok")
+	}else{
+		c.String(http.StatusNoContent,"")
+	}
+}

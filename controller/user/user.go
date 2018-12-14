@@ -120,3 +120,13 @@ func Signin(c *gin.Context) {
 	user.InsertDate(date)
 	c.String(http.StatusOK, "")
 }
+
+
+// GetNotice 获取最新公告
+func GetNotice(c *gin.Context) {
+	notice := &model.Notice{}
+	result := notice.Get() 
+	c.JSON(http.StatusOK,gin.H{
+		"msg": result.Message,
+	})
+}

@@ -75,9 +75,10 @@ func (p *Complaint) Agree(tid string) bool {
 	defer session.Close()
 	c := session.DB("test").C("bbs_feedback")
 	id := bson.ObjectIdHex(tid)
-	err := c.Update(bson.M{"tid": id}, bson.M{"$set": bson.M{"status": 1}})
+	_,err := c.UpdateAll(bson.M{"tid": id}, bson.M{"$set": bson.M{"status": 1}})
 	if err != nil {
 		return false
 	}
 	return true
 }
+
