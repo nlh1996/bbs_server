@@ -12,7 +12,7 @@ var (
 
 // InitDB 初始化数据库连接.
 func InitDB() {
-	Session,err = mgo.Dial("mongodb://admin:admin@115.159.77.155:11000?maxPoolSize=100")
+	Session,err = mgo.Dial("mongodb://admin:admin@115.159.77.155:11000?maxPoolSize=500")
 	if err != nil {
 		panic(err)
 	}

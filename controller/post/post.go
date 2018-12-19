@@ -35,13 +35,13 @@ func Publish(c *gin.Context) {
 		for index, img := range topStorey.ImgList {
 			if img[11] == 'j' {
 				img = img[23:]
-				path = fmt.Sprintf("/img/%x%d.jpg", string(topStorey.TID), index)
+				path = fmt.Sprintf("d:/image/%x%d.jpg", string(topStorey.TID), index)
 			} else if img[11] == 'p' {
 				img = img[22:]
-				path = fmt.Sprintf("/img/%x%d.png", string(topStorey.TID), index)
+				path = fmt.Sprintf("d:/image/%x%d.png", string(topStorey.TID), index)
 			} else if img[11] == 'g' {
 				img = img[22:]
-				path = fmt.Sprintf("/img/%x%d.gif", string(topStorey.TID), index)
+				path = fmt.Sprintf("d:/image/%x%d.gif", string(topStorey.TID), index)
 			} else {
 				fmt.Println("不支持该文件类型")
 			}

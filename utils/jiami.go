@@ -12,5 +12,7 @@ func Jiami(arg1 *string,arg2 *string)(string){
 	result := fmt.Sprintf("%x", h.Sum(nil))
 	h.Write([]byte(result + *arg2))
 	result = fmt.Sprintf("%x", h.Sum(nil))
+	h.Write([]byte(result + "你妈嗨"))
+	result = fmt.Sprintf("%x", h.Sum(nil))
 	return result
 }

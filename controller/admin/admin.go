@@ -37,9 +37,9 @@ func Login(c *gin.Context) {
 		common.TokenMap[tokenString] = admin.UName
 
 		c.JSON(http.StatusOK, gin.H{
-			"data": gin.H{
-				"token": tokenString,
-			},
+			"user": admin,
+			"isLoad": 2,
+			"token": tokenString,
 			"msg": msg,
 		})
 		return
