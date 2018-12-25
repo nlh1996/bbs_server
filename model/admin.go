@@ -1,6 +1,7 @@
 package model
 
 import (
+	"bbs_server/config"
 	"bbs_server/database"
 	"log"
 
@@ -29,7 +30,7 @@ type BlackName struct {
 
 // Notice 公告
 type Notice struct {
-	Message    string 			 	`json:"msg"`
+	Message    string `json:"msg"`
 	Createtime string
 }
 
@@ -37,7 +38,7 @@ type Notice struct {
 func (admin *Admin) Validator() (string, bool) {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_user")
+	c := session.DB(config.DbName).C("bbs_user")
 	result := &Admin{}
 	err := c.Find(bson.M{"uname": admin.UName}).One(result)
 	var msg string
@@ -59,7 +60,7 @@ func (admin *Admin) Validator() (string, bool) {
 func (msg *TodayMsg) LoginSave() {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_count")
+	c := session.DB(config.DbName).C("bbs_count")
 	result := &TodayMsg{}
 	err := c.Find(bson.M{"today": msg.Today}).One(result)
 	if err != nil {
@@ -73,7 +74,7 @@ func (msg *TodayMsg) LoginSave() {
 func (msg *TodayMsg) RegisterSave() {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_count")
+	c := session.DB(config.DbName).C("bbs_count")
 	result := &TodayMsg{}
 	err := c.Find(bson.M{"today": msg.Today}).One(result)
 	if err != nil {
@@ -87,7 +88,7 @@ func (msg *TodayMsg) RegisterSave() {
 func (msg *TodayMsg) AccessSave() {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_count")
+	c := session.DB(config.DbName).C("bbs_count")
 	result := &TodayMsg{}
 	err := c.Find(bson.M{"today": msg.Today}).One(result)
 	if err != nil {
@@ -101,7 +102,7 @@ func (msg *TodayMsg) AccessSave() {
 func (msg *TodayMsg) Search() *TodayMsg {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_count")
+	c := session.DB(config.DbName).C("bbs_count")
 	result := &TodayMsg{}
 	err := c.Find(bson.M{"today": msg.Today}).One(result)
 	if err != nil {
@@ -115,7 +116,7 @@ func (msg *TodayMsg) Search() *TodayMsg {
 func (msg *TodayMsg) Count() int {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_user")
+	c := session.DB(config.DbName).C("bbs_user")
 	num, err := c.Find(nil).Count()
 	if err != nil {
 		log.Fatal(err)
@@ -128,7 +129,7 @@ func (msg *TodayMsg) Count() int {
 func (p *BlackName) BlackNameSave() bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_blacklist")
+	c := session.DB(config.DbName).C("bbs_blacklist")
 	result := []BlackName{}
 	c.Find(bson.M{}).All(&result)
 	for index := range result {
@@ -147,7 +148,7 @@ func (p *BlackName) BlackNameSave() bool {
 func (p *BlackName) BlackNameRemove() bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_blacklist")
+	c := session.DB(config.DbName).C("bbs_blacklist")
 	err := c.Remove(bson.M{"uname": p.UName})
 	if err != nil {
 		log.Fatal(err)
@@ -160,7 +161,7 @@ func (p *BlackName) BlackNameRemove() bool {
 func (p *BlackName) BlackList() *[]BlackName {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_blacklist")
+	c := session.DB(config.DbName).C("bbs_blacklist")
 	list := &[]BlackName{}
 	err := c.Find(bson.M{}).All(list)
 	if err != nil {
@@ -171,26 +172,24 @@ func (p *BlackName) BlackList() *[]BlackName {
 }
 
 // Save 保存公告信息
-func (p *Notice) Save() bool{
+func (p *Notice) Save() bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_notices")
+	c := session.DB(config.DbName).C("bbs_notices")
 	err := c.Insert(p)
 	if err != nil {
-		log.Fatal(err)
 		return false
 	}
 	return true
 }
 
 // Get 获取公告信息
-func (p *Notice) Get() *Notice{
+func (p *Notice) Get() *Notice {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_notices")
+	c := session.DB(config.DbName).C("bbs_notices")
 	err := c.Find(nil).Sort("-_id").One(p)
 	if err != nil {
-		log.Fatal(err)
 		return nil
 	}
 	return p

@@ -97,7 +97,6 @@ func GetPost(c *gin.Context) {
 	} else {
 		c.String(http.StatusOK, "error,未正确获取到贴子!")
 	}
-
 }
 
 // Reply1 一级回复

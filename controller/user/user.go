@@ -52,7 +52,7 @@ func Register(c *gin.Context) {
 	user.PassWord = newPwd
 	user.CreateTime = utils.GetTimeStr()
 	if user.Find() == false {
-		user.Save()
+		user.Save()	
 		//统计每天用户注册数量
 		msg := &model.TodayMsg{}
 		msg.Today = utils.GetDateStr()

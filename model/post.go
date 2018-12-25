@@ -1,6 +1,7 @@
 package model
 
 import (
+	"bbs_server/config"
 	"bbs_server/database"
 	"fmt"
 
@@ -9,63 +10,63 @@ import (
 
 // Post 贴子结构
 type Post struct {
-	TopStorey  							  `json:"topStorey"`
-	ReList1     []Reply1      `json:"reList1"`
-	ReList2     []Reply2      `json:"reList2"`
-	UpdateTime  string        `json:"time"`
-	TID         bson.ObjectId `json:"tid"`
+	TopStorey  `json:"topStorey"`
+	ReList1    []Reply1      `json:"reList1"`
+	ReList2    []Reply2      `json:"reList2"`
+	UpdateTime string        `json:"time"`
+	TID        bson.ObjectId `json:"tid"`
 }
 
 // TopStorey .
 type TopStorey struct {
-	Title      	string        `json:"title"`
-	ImgList    	[]string      `json:"imgList"`
-	ReplyNum    uint32        `json:"replyNum"`
-	Support     uint32        `json:"support"`
-	ReadNum     uint32        `json:"readNum"`
-	ShareMsg		`bson:",inline"`
+	Title    string   `json:"title"`
+	ImgList  []string `json:"imgList"`
+	ReplyNum uint32   `json:"replyNum"`
+	Support  uint32   `json:"support"`
+	ReadNum  uint32   `json:"readNum"`
+	ShareMsg `bson:",inline"`
 }
 
 // Reply1 .
 type Reply1 struct {
-	ID        	bson.ObjectId `json:"id"`
-	Show				bool					`json:"show"`
-	RName 			string 			  `json:"rName"`
-	ShareMsg 		`bson:",inline"`
+	ID       bson.ObjectId `json:"id"`
+	Show     bool          `json:"show"`
+	RName    string        `json:"rName"`
+	ShareMsg `bson:",inline"`
 }
 
 // Reply2 .
 type Reply2 struct {
-	ID        	bson.ObjectId `json:"id"`
-	RID     		bson.ObjectId `json:"rid"`
-	RName 			string 			  `json:"rName"`
-	Show				bool					`json:"show"`
-	ShareMsg		`bson:",inline"`
+	ID       bson.ObjectId `json:"id"`
+	RID      bson.ObjectId `json:"rid"`
+	RName    string        `json:"rName"`
+	Show     bool          `json:"show"`
+	ShareMsg `bson:",inline"`
 }
 
 // ShareMsg .
 type ShareMsg struct {
-	HeadImg			string				`json:"headImg"`
-	UName 			string 				`json:"uName"`
-	CreateTime 	string				`json:"createTime"`
-	Content    	string    		`json:"content"`
-	TID        	bson.ObjectId `json:"tid"`
+	HeadImg    string        `json:"headImg"`
+	UName      string        `json:"uName"`
+	CreateTime string        `json:"createTime"`
+	Content    string        `json:"content"`
+	TID        bson.ObjectId `json:"tid"`
 }
 
 // HeadPost 置顶帖
 type HeadPost struct {
-	TID        	bson.ObjectId `json:"tid"`
-	Title      	string        `json:"title"`	
+	TID   bson.ObjectId `json:"tid"`
+	Title string        `json:"title"`
 }
 
 // Save 保存贴子信息.
 func (p *Post) Save() bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_user")
-	c.Update(bson.M{"uname": p.TopStorey.UName}, bson.M{"$inc": bson.M{ "exp": 15 }})
-	c.Update(bson.M{"uname": p.TopStorey.UName}, bson.M{"$inc": bson.M{ "integral": 15 }})
-	c = session.DB("test").C("bbs_posts")
+	c := session.DB(config.DbName).C("bbs_user")
+	c.Update(bson.M{"uname": p.TopStorey.UName}, bson.M{"$inc": bson.M{"exp": 15}})
+	c.Update(bson.M{"uname": p.TopStorey.UName}, bson.M{"$inc": bson.M{"integral": 15}})
+	c = session.DB(config.DbName).C("bbs_posts")
 	err := c.Insert(p)
 	if err != nil {
 		fmt.Println(err)
@@ -78,7 +79,7 @@ func (p *Post) Save() bool {
 func UpdatePosts(postsPool *[]Post) bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_posts")
+	c := session.DB(config.DbName).C("bbs_posts")
 	err := c.Find(bson.M{}).Sort("-_id").All(postsPool)
 	if err != nil {
 		fmt.Println(err)
@@ -91,14 +92,14 @@ func UpdatePosts(postsPool *[]Post) bool {
 func (p *Post) Get(tid bson.ObjectId) bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_posts")
+	c := session.DB(config.DbName).C("bbs_posts")
 	err := c.Find(bson.M{"tid": tid}).One(p)
 	if err != nil {
 		fmt.Println(err)
 		return false
 	}
-	c = session.DB("test").C("bbs_user")
-	c.Update(bson.M{"uname": p.TopStorey.UName}, bson.M{"$inc": bson.M{ "readnum": 1 }})
+	c = session.DB(config.DbName).C("bbs_user")
+	c.Update(bson.M{"uname": p.TopStorey.UName}, bson.M{"$inc": bson.M{"readnum": 1}})
 	return true
 }
 
@@ -106,13 +107,13 @@ func (p *Post) Get(tid bson.ObjectId) bool {
 func (reply1 *Reply1) Save(tid bson.ObjectId) bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_user")
-	c.Update(bson.M{"uname": reply1.UName}, bson.M{"$inc": bson.M{ "exp": 5 }})
-	c.Update(bson.M{"uname": reply1.UName}, bson.M{"$inc": bson.M{ "integral": 5 }})
-	c.Update(bson.M{"uname": reply1.RName}, bson.M{"$inc": bson.M{ "replynum": 1 }})
-	c = session.DB("test").C("bbs_posts")
-	err := c.Update(bson.M{"tid": tid}, bson.M{"$push": bson.M{ "relist1": reply1 }})
-	err = c.Update(bson.M{"tid": tid}, bson.M{"$inc": bson.M{ "topstorey.replynum": 1 }})
+	c := session.DB(config.DbName).C("bbs_user")
+	c.Update(bson.M{"uname": reply1.UName}, bson.M{"$inc": bson.M{"exp": 5}})
+	c.Update(bson.M{"uname": reply1.UName}, bson.M{"$inc": bson.M{"integral": 5}})
+	c.Update(bson.M{"uname": reply1.RName}, bson.M{"$inc": bson.M{"replynum": 1}})
+	c = session.DB(config.DbName).C("bbs_posts")
+	err := c.Update(bson.M{"tid": tid}, bson.M{"$push": bson.M{"relist1": reply1}})
+	err = c.Update(bson.M{"tid": tid}, bson.M{"$inc": bson.M{"topstorey.replynum": 1}})
 	if err != nil {
 		fmt.Println(err)
 		return false
@@ -124,12 +125,12 @@ func (reply1 *Reply1) Save(tid bson.ObjectId) bool {
 func (reply2 *Reply2) Save(id bson.ObjectId) bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_user")
-	c.Update(bson.M{"uname": reply2.UName}, bson.M{"$inc": bson.M{ "exp": 5 }})
-	c.Update(bson.M{"uname": reply2.UName}, bson.M{"$inc": bson.M{ "integral": 5 }})
-	c.Update(bson.M{"uname": reply2.RName}, bson.M{"$inc": bson.M{ "replynum": 1 }})
-	c = session.DB("test").C("bbs_posts")
-	err := c.Update(bson.M{"tid": id}, bson.M{"$push": bson.M{ "relist2": reply2 }})
+	c := session.DB(config.DbName).C("bbs_user")
+	c.Update(bson.M{"uname": reply2.UName}, bson.M{"$inc": bson.M{"exp": 5}})
+	c.Update(bson.M{"uname": reply2.UName}, bson.M{"$inc": bson.M{"integral": 5}})
+	c.Update(bson.M{"uname": reply2.RName}, bson.M{"$inc": bson.M{"replynum": 1}})
+	c = session.DB(config.DbName).C("bbs_posts")
+	err := c.Update(bson.M{"tid": id}, bson.M{"$push": bson.M{"relist2": reply2}})
 	if err != nil {
 		fmt.Println(err)
 		return false
@@ -138,10 +139,10 @@ func (reply2 *Reply2) Save(id bson.ObjectId) bool {
 }
 
 // Del 删除贴子
-func (p *Post) Del(tid bson.ObjectId,name string) bool{
+func (p *Post) Del(tid bson.ObjectId, name string) bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_posts")
+	c := session.DB(config.DbName).C("bbs_posts")
 	err := c.Find(bson.M{"tid": tid}).One(p)
 	if err != nil {
 		fmt.Println(err)
@@ -149,9 +150,9 @@ func (p *Post) Del(tid bson.ObjectId,name string) bool{
 	}
 	if p.TopStorey.UName == name || name == "admin" {
 		c.Remove(bson.M{"tid": tid})
-		c = session.DB("test").C("bbs_feedback")
+		c = session.DB(config.DbName).C("bbs_feedback")
 		c.Remove(bson.M{"tid": tid})
-		c = session.DB("test").C("bbs_zhiding")
+		c = session.DB(config.DbName).C("bbs_zhiding")
 		c.Remove(bson.M{"tid": tid})
 		return true
 	}
@@ -162,8 +163,8 @@ func (p *Post) Del(tid bson.ObjectId,name string) bool{
 func (p *Post) AddSupport() bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_posts")
-	err := c.Update(bson.M{"tid": p.TID}, bson.M{"$inc": bson.M{ "topstorey.support": 1 }})
+	c := session.DB(config.DbName).C("bbs_posts")
+	err := c.Update(bson.M{"tid": p.TID}, bson.M{"$inc": bson.M{"topstorey.support": 1}})
 	if err != nil {
 		return false
 	}
@@ -174,8 +175,8 @@ func (p *Post) AddSupport() bool {
 func (p *Post) ReduceSupport() bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_posts")
-	err := c.Update(bson.M{"tid": p.TID}, bson.M{"$inc": bson.M{ "topstorey.support": -1 }})
+	c := session.DB(config.DbName).C("bbs_posts")
+	err := c.Update(bson.M{"tid": p.TID}, bson.M{"$inc": bson.M{"topstorey.support": -1}})
 	if err != nil {
 		return false
 	}
@@ -186,14 +187,14 @@ func (p *Post) ReduceSupport() bool {
 func (p *Post) AgreeZhiDIng(tid string) bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_feedback")
+	c := session.DB(config.DbName).C("bbs_feedback")
 	id := bson.ObjectIdHex(tid)
-	_,err := c.UpdateAll(bson.M{"tid": id}, bson.M{"$set": bson.M{"status": 1}})
+	_, err := c.UpdateAll(bson.M{"tid": id}, bson.M{"$set": bson.M{"status": 1}})
 	if err != nil {
 		return false
 	}
 	p.Get(id)
-	c = session.DB("test").C("bbs_zhiding")
+	c = session.DB(config.DbName).C("bbs_zhiding")
 	headPost := &HeadPost{}
 	err2 := c.Find(bson.M{"tid": id}).One(headPost)
 	if err2 != nil {
@@ -208,11 +209,11 @@ func (p *Post) AgreeZhiDIng(tid string) bool {
 func (p *HeadPost) GetHeadPost() *[]HeadPost {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_zhiding")
+	c := session.DB(config.DbName).C("bbs_zhiding")
 	result := &[]HeadPost{}
 	err := c.Find(nil).Sort("-_id").Limit(3).All(result)
 	if err != nil {
 		return nil
 	}
-	return result	
+	return result
 }

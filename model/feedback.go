@@ -3,7 +3,7 @@ package model
 import (
 	"bbs_server/database"
 	"log"
-
+	"bbs_server/config"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -21,7 +21,7 @@ type Complaint struct {
 func (p *Complaint) Save() {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_feedback")
+	c := session.DB(config.DbName).C("bbs_feedback")
 	err := c.Insert(p)
 	if err != nil {
 		log.Fatal(err)
@@ -32,7 +32,7 @@ func (p *Complaint) Save() {
 func (p *Complaint) FeedList0() *[]Complaint {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_feedback")
+	c := session.DB(config.DbName).C("bbs_feedback")
 	list := &[]Complaint{}
 	err := c.Find(bson.M{"status": 0}).All(list)
 	if err != nil {
@@ -46,7 +46,7 @@ func (p *Complaint) FeedList0() *[]Complaint {
 func (p *Complaint) FeedList1() *[]Complaint {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_feedback")
+	c := session.DB(config.DbName).C("bbs_feedback")
 	list := &[]Complaint{}
 	err := c.Find(bson.M{"status": 1}).All(list)
 	if err != nil {
@@ -60,7 +60,7 @@ func (p *Complaint) FeedList1() *[]Complaint {
 func (p *Complaint) Del(tid string) bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_feedback")
+	c := session.DB(config.DbName).C("bbs_feedback")
 	id := bson.ObjectIdHex(tid)
 	err := c.Remove(bson.M{"tid": id})
 	if err != nil {
@@ -73,12 +73,11 @@ func (p *Complaint) Del(tid string) bool {
 func (p *Complaint) Agree(tid string) bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_feedback")
+	c := session.DB(config.DbName).C("bbs_feedback")
 	id := bson.ObjectIdHex(tid)
-	_,err := c.UpdateAll(bson.M{"tid": id}, bson.M{"$set": bson.M{"status": 1}})
+	_, err := c.UpdateAll(bson.M{"tid": id}, bson.M{"$set": bson.M{"status": 1}})
 	if err != nil {
 		return false
 	}
 	return true
 }
-

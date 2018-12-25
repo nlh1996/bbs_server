@@ -1,6 +1,7 @@
 package model
 
 import (
+	"bbs_server/config"
 	"bbs_server/database"
 	"bbs_server/utils"
 	"fmt"
@@ -15,11 +16,11 @@ type User struct {
 	UName      string   `json:"uName"`
 	PassWord   string   `json:"password"`
 	ReplyNum   uint32   `json:"replyNum"`
-	ReadNum		 uint32 	`json:"readNum"`
+	ReadNum    uint32   `json:"readNum"`
 	Support    uint32   `json:"support"`
 	Exp        uint32   `json:"exp"`
 	Integral   uint32   `json:"integral"`
-	CreateTime string		`json:"createTime"`
+	CreateTime string   `json:"createTime"`
 	SigninTime string   `json:"signinTime"`
 	MyReply    []string `json:"myReply"`
 	MyPosts    []string `json:"myPosts"`
@@ -32,7 +33,7 @@ type User struct {
 func (pUser *User) Save() {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_user")
+	c := session.DB(config.DbName).C("bbs_user")
 	err := c.Insert(pUser)
 	if err != nil {
 		log.Fatal(err)
@@ -43,7 +44,7 @@ func (pUser *User) Save() {
 func (pUser *User) Validator() (*User, string, bool) {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_user")
+	c := session.DB(config.DbName).C("bbs_user")
 	result := &User{}
 	err := c.Find(bson.M{"uname": pUser.UName}).One(result)
 	var msg string
@@ -65,7 +66,7 @@ func (pUser *User) Validator() (*User, string, bool) {
 func (pUser *User) Find() bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_user")
+	c := session.DB(config.DbName).C("bbs_user")
 	result := []User{}
 	c.Find(bson.M{}).All(&result)
 	for index := range result {
@@ -77,16 +78,16 @@ func (pUser *User) Find() bool {
 }
 
 // Search .
-func (pUser *User) Search() (bool,*User) {
+func (pUser *User) Search() (bool, *User) {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_user")
+	c := session.DB(config.DbName).C("bbs_user")
 	result := &User{}
 	err := c.Find(bson.M{"uname": pUser.UName}).One(result)
 	if err != nil {
-		return false,nil
+		return false, nil
 	}
-	return true,result
+	return true, result
 }
 
 // IsSignin 判断是否签到
@@ -101,7 +102,7 @@ func (pUser *User) IsSignin() bool {
 func (pUser *User) InsertDate(date string) {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_user")
+	c := session.DB(config.DbName).C("bbs_user")
 	c.Update(bson.M{"uname": pUser.UName}, bson.M{"$inc": bson.M{"exp": 10}})
 	c.Update(bson.M{"uname": pUser.UName}, bson.M{"$inc": bson.M{"integral": 10}})
 	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$set": bson.M{"signintime": date}})
@@ -114,7 +115,7 @@ func (pUser *User) InsertDate(date string) {
 func (pUser *User) SaveSupport(tid string) bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_user")
+	c := session.DB(config.DbName).C("bbs_user")
 	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$push": bson.M{"mysupport": tid}})
 	if err != nil {
 		return false
@@ -126,7 +127,7 @@ func (pUser *User) SaveSupport(tid string) bool {
 func (pUser *User) AddSupport() bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_user")
+	c := session.DB(config.DbName).C("bbs_user")
 	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$inc": bson.M{"support": 1}})
 	if err != nil {
 		fmt.Println(err)
@@ -139,7 +140,7 @@ func (pUser *User) AddSupport() bool {
 func (pUser *User) CancelSupport(tid string) bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_user")
+	c := session.DB(config.DbName).C("bbs_user")
 	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$pull": bson.M{"mysupport": tid}})
 	if err != nil {
 		return false
@@ -151,7 +152,7 @@ func (pUser *User) CancelSupport(tid string) bool {
 func (pUser *User) ReduceSupport() bool {
 	session := database.Session.Clone()
 	defer session.Close()
-	c := session.DB("test").C("bbs_user")
+	c := session.DB(config.DbName).C("bbs_user")
 	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$inc": bson.M{"support": -1}})
 	if err != nil {
 		fmt.Println(err)
