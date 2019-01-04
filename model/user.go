@@ -111,12 +111,24 @@ func (pUser *User) InsertDate(date string) {
 	}
 }
 
-// SaveSupport 点赞记录贴子id
+// SaveSupport 记录点赞贴子id
 func (pUser *User) SaveSupport(tid string) bool {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB(config.DbName).C("bbs_user")
 	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$push": bson.M{"mysupport": tid}})
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+// SaveMyPost 记录发帖贴子id
+func (pUser *User) SaveMyPost(tid string) bool {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB(config.DbName).C("bbs_user")
+	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$push": bson.M{"myposts": tid}})
 	if err != nil {
 		return false
 	}
@@ -136,12 +148,24 @@ func (pUser *User) AddSupport() bool {
 	return true
 }
 
-// CancelSupport 删除点赞记录
-func (pUser *User) CancelSupport(tid string) bool {
+// DelSupport 删除点赞记录
+func (pUser *User) DelSupport(tid string) bool {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB(config.DbName).C("bbs_user")
 	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$pull": bson.M{"mysupport": tid}})
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+// DelMyPost 删除贴子记录
+func (pUser *User) DelMyPost(tid string) bool {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB(config.DbName).C("bbs_user")
+	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$pull": bson.M{"myposts": tid}})
 	if err != nil {
 		return false
 	}

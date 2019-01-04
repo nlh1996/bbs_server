@@ -50,7 +50,7 @@ func Publish(c *gin.Context) {
 			if err != nil {
 				fmt.Println(err.Error())
 			}
-			//图片写入文件
+			// 图片写入文件
 			f, _ := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModePerm)
 			defer f.Close()
 			f.Write(data)
@@ -60,14 +60,17 @@ func Publish(c *gin.Context) {
 		}
 	}
 
-	//记录贴子更新时间
+	// 记录贴子更新时间
 	post.UpdateTime = topStorey.CreateTime
-	//记录帖子的唯一id
+	// 记录帖子的唯一id
 	post.TID = topStorey.TID
-	//将贴子保存到数据库
+	// 将贴子保存到数据库
 	if post.Save() {
+		name := &model.User{}
+		name.UName = topStorey.UName
+		name.SaveMyPost(topStorey.TID.Hex())
 		c.String(http.StatusOK, "success")
-	}else{
+	}else {
 		c.String(http.StatusOK, "未能成功保存")
 	}
 }
@@ -94,7 +97,7 @@ func GetPost(c *gin.Context) {
 			"post": *post,
 			"msg":  "scessue",
 		})
-	} else {
+	}else {
 		c.String(http.StatusOK, "error,未正确获取到贴子!")
 	}
 }
@@ -113,7 +116,7 @@ func Reply1(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"reply": *reply1,
 		})
-	} else {
+	}else {
 		c.String(http.StatusOK, "内部错误")
 	}
 }
@@ -132,7 +135,7 @@ func Reply2(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"reply": *reply2,
 		})
-	} else {
+	}else {
 		c.String(http.StatusOK, "内部错误")
 	}
 }
@@ -146,24 +149,27 @@ func DelPost(c *gin.Context) {
 		return
 	}
 	if post.Del(post.TID,name) {
+		user := &model.User{}
+		user.UName = name
+		user.DelMyPost(post.TID.Hex())
 		c.String(http.StatusOK, "删除成功")
-	} else {
+	}else {
 		c.String(http.StatusOK, "删除失败")
 	}
 }
 
 // Support 点赞行为
 func Support(c *gin.Context) {
-	//点赞用户，记录点赞的帖子
+	// 点赞用户，记录点赞的帖子
 	name := &model.User{}
 	post := &model.Post{}
 	name.UName = c.Request.Header["Authorization"][0]
 	tid := c.PostForm("tid")
 	name.SaveSupport(tid)
-	//被点赞用户，增加点赞数
+	// 被点赞用户，增加点赞数
 	name.UName = c.PostForm("name")
 	name.AddSupport()
-	//被点赞贴子，增加点赞数
+	// 被点赞贴子，增加点赞数
 	post.TID = bson.ObjectIdHex(tid)
 	post.AddSupport()
 	c.String(http.StatusOK,"")
@@ -171,16 +177,16 @@ func Support(c *gin.Context) {
 
 // Cancel 取消赞
 func Cancel(c *gin.Context) {
-	//点赞用户，删除点赞的帖子
+	// 点赞用户，删除点赞的帖子
 	name := &model.User{}
 	post := &model.Post{}
 	name.UName = c.Request.Header["Authorization"][0]
 	tid := c.PostForm("tid")
-	name.CancelSupport(tid)
-	//被点赞用户，减少点赞数
+	name.DelSupport(tid)
+	// 被点赞用户，减少点赞数
 	name.UName = c.PostForm("name")
 	name.ReduceSupport()
-	//被点赞贴子，减少点赞数
+	// 被点赞贴子，减少点赞数
 	post.TID = bson.ObjectIdHex(tid)
 	post.ReduceSupport()
 }
