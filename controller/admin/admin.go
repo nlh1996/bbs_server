@@ -10,6 +10,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // Login 管理员登录
@@ -37,10 +38,10 @@ func Login(c *gin.Context) {
 		common.TokenMap[tokenString] = admin.UName
 
 		c.JSON(http.StatusOK, gin.H{
-			"user": admin,
+			"user":   admin,
 			"isLoad": 2,
-			"token": tokenString,
-			"msg": msg,
+			"token":  tokenString,
+			"msg":    msg,
 		})
 		return
 	}
@@ -54,26 +55,26 @@ func Count(c *gin.Context) {
 	msg = msg.Search()
 	num := msg.Count()
 	c.JSON(http.StatusOK, gin.H{
-		"count": *msg,
+		"count":   *msg,
 		"userNum": num,
 	})
 }
 
 // UserSearch 用户搜索。
-func UserSearch (c *gin.Context) {
+func UserSearch(c *gin.Context) {
 	user := &model.User{}
 	user.UName = c.PostForm("name")
 	var result bool
-	result,user = user.Search()
+	result, user = user.Search()
 	if result {
 		c.JSON(http.StatusOK, gin.H{
-			"name": user.UName,
+			"name":  user.UName,
 			"level": user.Exp,
 			"jifen": user.Integral,
-			"time": user.CreateTime,
+			"time":  user.CreateTime,
 		})
-	}else{
-		c.String(http.StatusNoContent,"没有该用户！")
+	} else {
+		c.String(http.StatusNoContent, "没有该用户！")
 	}
 }
 
@@ -84,10 +85,10 @@ func AddBlackList(c *gin.Context) {
 	user.Time = utils.GetTimeStr()
 	result := user.BlackNameSave()
 	if result == true {
-		c.String(http.StatusOK,"scess")
+		c.String(http.StatusOK, "scess")
 		common.BlackList = user.BlackList()
-	}else {
-		c.String(http.StatusAccepted,"用户已经拉黑")
+	} else {
+		c.String(http.StatusAccepted, "用户已经拉黑")
 	}
 }
 
@@ -97,10 +98,10 @@ func RemoveBlackList(c *gin.Context) {
 	user.UName = c.PostForm("name")
 	result := user.BlackNameRemove()
 	if result == true {
-		c.String(http.StatusOK,"删除成功！")
+		c.String(http.StatusOK, "删除成功！")
 		common.BlackList = user.BlackList()
-	}else{
-		c.String(http.StatusOK,"内部出错！")
+	} else {
+		c.String(http.StatusOK, "内部出错！")
 	}
 }
 
@@ -135,10 +136,10 @@ func GetFeedList1(c *gin.Context) {
 func DelFeedBack(c *gin.Context) {
 	tid := c.PostForm("tid")
 	feedBack := &model.Complaint{}
-	result := feedBack.Del(tid) 
+	result := feedBack.Del(tid)
 	if result {
 		c.String(http.StatusOK, "ok")
-	}else{
+	} else {
 		c.String(http.StatusNoContent, "")
 	}
 }
@@ -147,10 +148,12 @@ func DelFeedBack(c *gin.Context) {
 func AgreeFeedBack(c *gin.Context) {
 	tid := c.PostForm("tid")
 	feedBack := &model.Complaint{}
-	result := feedBack.Agree(tid) 
+	result := feedBack.Agree(tid)
 	if result {
+		post := &model.Post{}
+		post.Del(bson.ObjectIdHex(tid), "admin")
 		c.String(http.StatusOK, "ok")
-	}else{
+	} else {
 		c.String(http.StatusNoContent, "")
 	}
 }
@@ -159,10 +162,10 @@ func AgreeFeedBack(c *gin.Context) {
 func ZhiDing(c *gin.Context) {
 	tid := c.PostForm("tid")
 	post := &model.Post{}
-	result := post.AgreeZhiDIng(tid) 
+	result := post.AgreeZhiDIng(tid)
 	if result {
 		c.String(http.StatusOK, "ok")
-	}else{
+	} else {
 		c.String(http.StatusNoContent, "")
 	}
 }
@@ -175,10 +178,10 @@ func AddNotice(c *gin.Context) {
 		fmt.Println(err.Error())
 		return
 	}
-	result := notice.Save() 
-	if(result) {
-		c.String(http.StatusOK,"ok")
-	}else{
-		c.String(http.StatusNoContent,"")
+	result := notice.Save()
+	if result {
+		c.String(http.StatusOK, "ok")
+	} else {
+		c.String(http.StatusNoContent, "")
 	}
 }

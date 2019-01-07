@@ -84,7 +84,7 @@ func GetPosts(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"posts": topStoreys,
-		"msg":   "scessue",
+		"msg": "scessue",
 	})
 }
 
@@ -95,7 +95,7 @@ func GetPost(c *gin.Context) {
 	if post.Get(bson.ObjectIdHex(tid)) {
 		c.JSON(http.StatusOK, gin.H{
 			"post": *post,
-			"msg":  "scessue",
+			"msg": "scessue",
 		})
 	}else {
 		c.String(http.StatusOK, "error,未正确获取到贴子!")
@@ -179,7 +179,7 @@ func Support(c *gin.Context) {
 func Cancel(c *gin.Context) {
 	// 点赞用户，删除点赞的帖子
 	name := &model.User{}
-	post := &model.Post{}
+	post := &model.Post{}        
 	name.UName = c.Request.Header["Authorization"][0]
 	tid := c.PostForm("tid")
 	name.DelSupport(tid)
