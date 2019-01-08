@@ -5,7 +5,6 @@ import (
 	"bbs_server/model"
 	"bbs_server/utils"
 	"fmt"
-	"log"
 	"net/http"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -23,7 +22,7 @@ func IsLoad(c *gin.Context) {
 		isLoad = 1
 	}
 	var result bool
-	result,user = user.Search()
+	result, user = user.Search()
 	isSignin := user.IsSignin()
 	if result {
 		c.JSON(http.StatusOK, gin.H{
@@ -33,8 +32,8 @@ func IsLoad(c *gin.Context) {
 				"isLoad":   isLoad,
 			},
 		})
-	}else{
-		c.String(http.StatusOK,"内部错误！")
+	} else {
+		c.String(http.StatusOK, "内部错误！")
 	}
 }
 
@@ -46,13 +45,12 @@ func Register(c *gin.Context) {
 	err := c.Bind(user)
 	if err != nil {
 		fmt.Println(err)
-		log.Fatal(err)
 	}
 	newPwd := utils.Jiami(&user.PassWord, &user.UName)
 	user.PassWord = newPwd
 	user.CreateTime = utils.GetTimeStr()
 	if user.Find() == false {
-		user.Save()	
+		user.Save()
 		//统计每天用户注册数量
 		msg := &model.TodayMsg{}
 		msg.Today = utils.GetDateStr()
@@ -68,12 +66,12 @@ func Login(c *gin.Context) {
 	user := &model.User{}
 	err := c.Bind(user)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
-	for _,item := range *common.BlackList {
+	for _, item := range *common.BlackList {
 		if item.UName == user.UName {
-			c.String(http.StatusAccepted,"该账号已被封禁，请联系管理员解封。")
-			return 
+			c.String(http.StatusAccepted, "该账号已被封禁，请联系管理员解封。")
+			return
 		}
 	}
 	newPwd := utils.Jiami(&user.PassWord, &user.UName)
@@ -121,13 +119,12 @@ func Signin(c *gin.Context) {
 	c.String(http.StatusOK, "")
 }
 
-
 // GetNotice 获取最新公告
 func GetNotice(c *gin.Context) {
 	notice := &model.Notice{}
-	result := notice.Get() 
-	c.JSON(http.StatusOK,gin.H{
-		"msg": result.Message,
+	notice.Get()
+	c.JSON(http.StatusOK, gin.H{
+		"msg": notice.Message,
 	})
 }
 
@@ -135,7 +132,19 @@ func GetNotice(c *gin.Context) {
 func GetZhiDing(c *gin.Context) {
 	headPost := &model.HeadPost{}
 	result := headPost.GetHeadPost()
-	c.JSON(http.StatusOK,gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"list": result,
 	})
 }
+
+// GetMyPosts 获取用户自身的贴子
+func GetMyPosts(c *gin.Context) {
+	user := &model.User{}
+	user.UName = c.Request.Header["Authorization"][0]
+	myposts := user.Myposts() 
+	if myposts != nil {
+		c.JSON( http.StatusOK, gin.H{
+			"myposts": myposts,
+		})
+	}
+} 

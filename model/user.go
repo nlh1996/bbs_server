@@ -29,6 +29,13 @@ type User struct {
 	// lastLoginAt string
 }
 
+// Mypost .
+type Mypost struct {
+	Title      string `json:"title"`
+	CreateTime string `json:"createTime"`
+	TID        bson.ObjectId `json:"tid"`
+}
+
 // Save .
 func (pUser *User) Save() {
 	session := database.Session.Clone()
@@ -184,3 +191,24 @@ func (pUser *User) ReduceSupport() bool {
 	}
 	return true
 }
+
+// Myposts .
+func (pUser *User) Myposts() *[]Mypost {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB(config.DbName).C("bbs_user")
+	err := c.Find(bson.M{"uname": pUser.UName}).One(pUser)
+	if err != nil {
+		return nil
+	}
+	c = session.DB(config.DbName).C("bbs_posts")
+	posts := []Mypost{}
+	post := &Post{}
+	for _, v := range pUser.MyPosts {
+		c.Find(bson.M{"tid": bson.ObjectIdHex(v)}).One(post)
+		mypost := Mypost{CreateTime: post.TopStorey.CreateTime, Title: post.TopStorey.Title, TID: post.TID}
+		posts = append(posts, mypost)
+	}
+	return &posts
+}
+

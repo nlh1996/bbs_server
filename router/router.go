@@ -42,6 +42,7 @@ func Init() {
 		v2.POST("/support", post.Support)
 		v2.POST("/cancel", post.Cancel)
 		v2.POST("/complaint", feedback.Complaint)
+		v2.POST("/user/myposts", user.GetMyPosts)
 	}
 	// 管理员路由组（管理员请求）
 	adminAPI := router.Group("/admin")

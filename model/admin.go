@@ -3,6 +3,7 @@ package model
 import (
 	"bbs_server/config"
 	"bbs_server/database"
+	"fmt"
 	"log"
 
 	"gopkg.in/mgo.v2/bson"
@@ -184,13 +185,12 @@ func (p *Notice) Save() bool {
 }
 
 // Get 获取公告信息
-func (p *Notice) Get() *Notice {
+func (p *Notice) Get() {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB(config.DbName).C("bbs_notices")
 	err := c.Find(nil).Sort("-_id").One(p)
 	if err != nil {
-		return nil
+		fmt.Println(err)
 	}
-	return p
 }
