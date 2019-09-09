@@ -8,7 +8,6 @@ import (
 	"log"
 
 	"gopkg.in/mgo.v2/bson"
-	// "fmt"
 )
 
 // User .
@@ -31,8 +30,8 @@ type User struct {
 
 // Mypost .
 type Mypost struct {
-	Title      string `json:"title"`
-	CreateTime string `json:"createTime"`
+	Title      string        `json:"title"`
+	CreateTime string        `json:"createTime"`
 	TID        bson.ObjectId `json:"tid"`
 }
 
@@ -211,4 +210,3 @@ func (pUser *User) Myposts() *[]Mypost {
 	}
 	return &posts
 }
-

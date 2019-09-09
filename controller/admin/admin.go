@@ -5,7 +5,6 @@ import (
 	"bbs_server/model"
 	"bbs_server/utils"
 	"fmt"
-	"log"
 	"net/http"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -19,7 +18,6 @@ func Login(c *gin.Context) {
 	err := c.Bind(admin)
 	if err != nil {
 		fmt.Println(err)
-		log.Fatal(err)
 	}
 	newPwd := utils.Jiami(&admin.PassWord, &admin.UName)
 	admin.PassWord = newPwd

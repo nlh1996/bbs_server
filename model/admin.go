@@ -3,7 +3,6 @@ package model
 import (
 	"bbs_server/config"
 	"bbs_server/database"
-	"fmt"
 	"log"
 
 	"gopkg.in/mgo.v2/bson"
@@ -191,6 +190,6 @@ func (p *Notice) Get() {
 	c := session.DB(config.DbName).C("bbs_notices")
 	err := c.Find(nil).Sort("-_id").One(p)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 }

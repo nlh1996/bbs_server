@@ -97,7 +97,7 @@ func Login(c *gin.Context) {
 		//是否签到过
 		isSignin := pUser.IsSignin()
 		c.JSON(http.StatusOK, gin.H{
-			"data": gin.H{
+			"data": gin.H {
 				"token":    tokenString,
 				"user":     *pUser,
 				"isSignin": isSignin,

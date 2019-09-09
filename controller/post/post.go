@@ -95,7 +95,7 @@ func GetPost(c *gin.Context) {
 	if post.Get(bson.ObjectIdHex(tid)) {
 		c.JSON(http.StatusOK, gin.H{
 			"post": *post,
-			"msg": "scessue",
+			"msg": "success",
 		})
 	}else {
 		c.String(http.StatusOK, "error,未正确获取到贴子!")
