@@ -4,7 +4,7 @@ import (
 	"bbs_server/common"
 	"bbs_server/model"
 	"bbs_server/utils"
-	"fmt"
+	"log"
 	"net/http"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -40,11 +40,10 @@ func IsLoad(c *gin.Context) {
 // Register 用户注册
 func Register(c *gin.Context) {
 	user := &model.User{}
-	fmt.Printf("%x\n", &user)
 
 	err := c.Bind(user)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	newPwd := utils.Jiami(&user.PassWord, &user.UName)
 	user.PassWord = newPwd
@@ -66,7 +65,7 @@ func Login(c *gin.Context) {
 	user := &model.User{}
 	err := c.Bind(user)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	for _, item := range *common.BlackList {
 		if item.UName == user.UName {
@@ -88,7 +87,7 @@ func Login(c *gin.Context) {
 		})
 		tokenString, err := token.SignedString([]byte("123"))
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Println(err.Error())
 			c.String(http.StatusOK, "内部错误")
 			return
 		}
@@ -97,7 +96,7 @@ func Login(c *gin.Context) {
 		//是否签到过
 		isSignin := pUser.IsSignin()
 		c.JSON(http.StatusOK, gin.H{
-			"data": gin.H {
+			"data": gin.H{
 				"token":    tokenString,
 				"user":     *pUser,
 				"isSignin": isSignin,
@@ -141,10 +140,10 @@ func GetZhiDing(c *gin.Context) {
 func GetMyPosts(c *gin.Context) {
 	user := &model.User{}
 	user.UName = c.Request.Header["Authorization"][0]
-	myposts := user.Myposts() 
+	myposts := user.Myposts()
 	if myposts != nil {
-		c.JSON( http.StatusOK, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"myposts": myposts,
 		})
 	}
-} 
+}

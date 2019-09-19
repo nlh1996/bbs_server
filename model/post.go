@@ -3,7 +3,7 @@ package model
 import (
 	"bbs_server/config"
 	"bbs_server/database"
-	"fmt"
+	"log"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -69,7 +69,7 @@ func (p *Post) Save() bool {
 	c = session.DB(config.DbName).C("bbs_posts")
 	err := c.Insert(p)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false
 	}
 	return true
@@ -82,7 +82,7 @@ func UpdatePosts(postsPool *[]Post) bool {
 	c := session.DB(config.DbName).C("bbs_posts")
 	err := c.Find(bson.M{}).Sort("-_id").All(postsPool)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false
 	}
 	return true
@@ -95,7 +95,7 @@ func (p *Post) Get(tid bson.ObjectId) bool {
 	c := session.DB(config.DbName).C("bbs_posts")
 	err := c.Find(bson.M{"tid": tid}).One(p)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false
 	}
 	c = session.DB(config.DbName).C("bbs_user")
@@ -115,7 +115,7 @@ func (reply1 *Reply1) Save(tid bson.ObjectId) bool {
 	err := c.Update(bson.M{"tid": tid}, bson.M{"$push": bson.M{"relist1": reply1}})
 	err = c.Update(bson.M{"tid": tid}, bson.M{"$inc": bson.M{"topstorey.replynum": 1}})
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false
 	}
 	return true
@@ -132,7 +132,7 @@ func (reply2 *Reply2) Save(id bson.ObjectId) bool {
 	c = session.DB(config.DbName).C("bbs_posts")
 	err := c.Update(bson.M{"tid": id}, bson.M{"$push": bson.M{"relist2": reply2}})
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false
 	}
 	return true
@@ -145,7 +145,7 @@ func (p *Post) Del(tid bson.ObjectId, name string) bool {
 	c := session.DB(config.DbName).C("bbs_posts")
 	err := c.Find(bson.M{"tid": tid}).One(p)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false
 	}
 	if p.TopStorey.UName == name || name == "admin" {

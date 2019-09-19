@@ -4,7 +4,6 @@ import (
 	"bbs_server/config"
 	"bbs_server/database"
 	"bbs_server/utils"
-	"fmt"
 	"log"
 
 	"gopkg.in/mgo.v2/bson"
@@ -148,7 +147,7 @@ func (pUser *User) AddSupport() bool {
 	c := session.DB(config.DbName).C("bbs_user")
 	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$inc": bson.M{"support": 1}})
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false
 	}
 	return true
@@ -185,7 +184,7 @@ func (pUser *User) ReduceSupport() bool {
 	c := session.DB(config.DbName).C("bbs_user")
 	err := c.Update(bson.M{"uname": pUser.UName}, bson.M{"$inc": bson.M{"support": -1}})
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false
 	}
 	return true
