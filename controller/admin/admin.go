@@ -5,6 +5,7 @@ import (
 	"bbs_server/model"
 	"bbs_server/utils"
 	"fmt"
+	"log"
 	"net/http"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -173,7 +174,7 @@ func AddNotice(c *gin.Context) {
 	notice := &model.Notice{}
 	notice.Createtime = utils.GetTimeStr()
 	if err := c.Bind(notice); err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 		return
 	}
 	result := notice.Save()
@@ -182,4 +183,18 @@ func AddNotice(c *gin.Context) {
 	} else {
 		c.String(http.StatusNoContent, "")
 	}
+}
+
+// SendGiftPack .
+func SendGiftPack(c *gin.Context) {
+	gift := &model.Gift{}
+	if err := c.Bind(gift); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := gift.Save(); err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.String(http.StatusOK, "ok")
 }

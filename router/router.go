@@ -59,6 +59,7 @@ func Init() {
 		adminAPI.POST("/agreeFeedBack", admin.AgreeFeedBack)
 		adminAPI.POST("/notices/save", admin.AddNotice)
 		adminAPI.POST("/zhiding", admin.ZhiDing)
+		adminAPI.POST("/sendGiftPack", admin.SendGiftPack)
 	}
 
 	router.Run(":8000")
