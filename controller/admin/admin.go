@@ -192,6 +192,11 @@ func SendGiftPack(c *gin.Context) {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
+	filter := bson.M{"channel": gift.Channel, "area": gift.Area, "giftpackname": gift.GiftPackName}
+	if err := gift.FindOne(filter); err == nil {
+		c.String(http.StatusBadRequest, "请不要重复发送该礼包！")
+		return
+	}
 	if err := gift.Save(); err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return

@@ -13,5 +13,4 @@ func main() {
 	blackName := &model.BlackName{}
 	common.BlackList = blackName.BlackList()
 	router.Init()
-
 }

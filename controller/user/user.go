@@ -9,6 +9,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // IsLoad .
@@ -146,4 +147,27 @@ func GetMyPosts(c *gin.Context) {
 			"myposts": myposts,
 		})
 	}
+}
+
+// ShowGiftPack .
+func ShowGiftPack(c *gin.Context) {
+	gift := &model.Gift{}
+	if err := c.Bind(gift); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	filter := bson.M{"channel": gift.Channel, "area": gift.Area}
+	res, err := gift.Search(filter)
+	if err != nil {
+		c.String(http.StatusAccepted, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"gift": res,
+	})
+}
+
+// GetGiftPack .
+func GetGiftPack(c *gin.Context) {
+
 }
