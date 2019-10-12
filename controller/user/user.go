@@ -169,5 +169,32 @@ func ShowGiftPack(c *gin.Context) {
 
 // GetGiftPack .
 func GetGiftPack(c *gin.Context) {
+	gift := &model.Gift{}
+	if err := c.Bind(gift); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	code := &model.RedeemCode{}
+	filter := bson.M{"channel": gift.Channel, "area": gift.Area, "giftpackname": gift.GiftPackName, "geted": false}
+	if err := code.FindOne(filter); err != nil {
+		log.Println(err)
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
 
+	filter = bson.M{"$set": bson.M{"geted": true}}
+	if err := code.Update(filter); err != nil {
+		log.Println(err)
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	
+	if err := gift.Update(); err != nil {
+		log.Println(err)
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": code,
+	})
 }
