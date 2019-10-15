@@ -3,6 +3,7 @@ package model
 import (
 	"bbs_server/config"
 	"bbs_server/database"
+	"sync"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -58,8 +59,12 @@ func (g *Gift) FindOne(filter interface{}) error {
 	return c.Find(filter).One(g)
 }
 
+var mx = sync.Mutex{}
+
 // Update .
 func (g *Gift) Update() error {
+	mx.Lock()
+	defer mx.Unlock()
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB(config.DbName).C("bbs_gift")
@@ -67,8 +72,12 @@ func (g *Gift) Update() error {
 	return c.Update(filter, bson.M{"$inc": bson.M{"giftpacknum": -1}})
 }
 
+var mutex = sync.Mutex{}
+
 // FindOne .
 func (code *RedeemCode) FindOne(filter interface{}) error {
+	mutex.Lock()
+	defer mutex.Unlock()
 	session := database.Session2.Clone()
 	defer session.Close()
 	c := session.DB(config.GM).C("code")
@@ -82,4 +91,3 @@ func (code *RedeemCode) Update(filter interface{}) error {
 	c := session.DB(config.GM).C("code")
 	return c.Update(bson.M{"_id": code.Code}, filter)
 }
-
