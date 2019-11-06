@@ -1,9 +1,11 @@
 package middleware
 
 import (
+	"mirgm/gmconf"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/unrolled/secure"
 )
 
 // CrossDomain 跨域处理
@@ -12,7 +14,7 @@ func CrossDomain() gin.HandlerFunc {
 		//origin := "http://"+c.Request.Host
 		// 设置允许访问的域
 		//c.Header("Access-Control-Allow-Origin", "http://115.159.77.155:11500")
-		c.Header("Access-Control-Allow-Origin", "http://192.168.1.11:3001")
+		c.Header("Access-Control-Allow-Origin", "http://www.yinghuo2018.com:11900")
 		// 服务器支持的所有跨域请求的方法,为了避免浏览次请求的多次'预检'请求
 		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE,UPDATE")
 		// header的类型
@@ -31,5 +33,22 @@ func CrossDomain() gin.HandlerFunc {
 		}
 		c.Next()
 		return
+	}
+}
+
+// TlsHandler .
+func TlsHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		secureMiddleware := secure.New(secure.Options{
+			SSLRedirect: true,
+			SSLHost:     gmconf.PORT,
+		})
+		err := secureMiddleware.Process(c.Writer, c.Request)
+
+		// If there was an error, do not continue.
+		if err != nil {
+			return
+		}
+		c.Next()
 	}
 }

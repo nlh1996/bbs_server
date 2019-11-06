@@ -16,6 +16,7 @@ func Init() {
 	router := gin.Default()
 	// CrossDomain跨域处理，options请求处理
 	router.Use(middleware.CrossDomain())
+	router.Use(middleware.TlsHandler())
 	// v1群组对任何人开放
 	v1 := router.Group("/v1")
 	{
@@ -63,6 +64,6 @@ func Init() {
 		adminAPI.POST("/zhiding", admin.ZhiDing)
 		adminAPI.POST("/sendGiftPack", admin.SendGiftPack)
 	}
-
-	router.Run(":8000")
+	router.RunTLS(":8000", "./ssl/1_www.yinghuo2018.com_bundle.crt", "./ssl/2_www.yinghuo2018.com.key")
+	// router.Run(":8000")
 }

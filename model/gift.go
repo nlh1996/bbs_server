@@ -64,12 +64,13 @@ var mx = sync.Mutex{}
 // Update .
 func (g *Gift) Update() error {
 	mx.Lock()
-	defer mx.Unlock()
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB(config.DbName).C("bbs_gift")
 	filter := bson.M{"channel": g.Channel, "area": g.Area, "giftpackname": g.GiftPackName}
-	return c.Update(filter, bson.M{"$inc": bson.M{"giftpacknum": -1}})
+	err :=  c.Update(filter, bson.M{"$inc": bson.M{"giftpacknum": -1}})
+	mx.Unlock()
+	return err
 }
 
 var mutex = sync.Mutex{}
@@ -77,11 +78,12 @@ var mutex = sync.Mutex{}
 // FindOne .
 func (code *RedeemCode) FindOne(filter interface{}) error {
 	mutex.Lock()
-	defer mutex.Unlock()
 	session := database.Session2.Clone()
 	defer session.Close()
 	c := session.DB(config.GM).C("code")
-	return c.Find(filter).One(code)
+	err := c.Find(filter).One(code)
+	mutex.Unlock()
+	return err
 }
 
 // Update .
