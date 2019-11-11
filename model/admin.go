@@ -34,28 +34,6 @@ type Notice struct {
 	Createtime string
 }
 
-// Game .
-type Game struct {
-	Name   string
-	ImgURL string
-}
-
-// Save .
-func (g *Game) Save() error {
-	session := database.Session.Clone()
-	defer session.Close()
-	c := session.DB(config.DbName).C("bbs_games")
-	return c.Insert(g)
-}
-
-// GetGames .
-func GetGames(games *[]Game) (error) {
-	session := database.Session.Clone()
-	defer session.Close()
-	c := session.DB(config.DbName).C("bbs_games")
-	return c.Find(bson.M{}).All(games)
-}
-
 // Validator .
 func (admin *Admin) Validator() (string, bool) {
 	session := database.Session.Clone()

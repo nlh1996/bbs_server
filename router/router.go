@@ -28,7 +28,6 @@ func Init() {
 		v1.POST("/admin", admin.Login)
 		v1.GET("/notices/get", user.GetNotice)
 		v1.GET("/zhiding/get", user.GetZhiDing)
-		v1.GET("/getGames", index.GetGames)
 	}
 
 	v2 := router.Group("/v2")
@@ -64,7 +63,7 @@ func Init() {
 		adminAPI.POST("/notices/save", admin.AddNotice)
 		adminAPI.POST("/zhiding", admin.ZhiDing)
 		adminAPI.POST("/sendGiftPack", admin.SendGiftPack)
-		adminAPI.POST("/addGame", admin.AddGame)
+		adminAPI.POST("/addTopic", admin.AddTopic)
 	}
 	//router.RunTLS(":8000", "./ssl/1_www.yinghuo2018.com_bundle.crt", "./ssl/2_www.yinghuo2018.com.key")
 	router.Run(":8000")

@@ -53,6 +53,7 @@ type ShareMsg struct {
 	TID        bson.ObjectId `json:"tid"`
 	Type       int           `json:"type"`
 	Tag        int           `json:"tag"`
+	Topic      string        `json:"topic"`
 }
 
 // HeadPost 置顶帖
@@ -68,6 +69,8 @@ func (p *Post) Save() bool {
 	c := session.DB(config.DbName).C("bbs_user")
 	c.Update(bson.M{"uname": p.TopStorey.UName}, bson.M{"$inc": bson.M{"exp": 15}})
 	c.Update(bson.M{"uname": p.TopStorey.UName}, bson.M{"$inc": bson.M{"integral": 15}})
+	c = session.DB(config.DbName).C("bbs_topics")
+	c.Update(bson.M{"name": p.ShareMsg.Topic}, bson.M{"$inc": bson.M{"num": 1}})
 	c = session.DB(config.DbName).C("bbs_posts")
 	err := c.Insert(p)
 	if err != nil {
@@ -78,16 +81,11 @@ func (p *Post) Save() bool {
 }
 
 // UpdatePosts 获取所有贴子.
-func UpdatePosts(postsPool *[]Post) bool {
+func UpdatePosts(postsPool *[]Post, topic string) error {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB(config.DbName).C("bbs_posts")
-	err := c.Find(bson.M{}).Sort("-_id").All(postsPool)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-	return true
+	return c.Find(bson.M{"topstorey.topic": topic}).Sort("-_id").All(postsPool)
 }
 
 // Get 获取单个贴子详情.
@@ -136,7 +134,7 @@ func (reply2 *Reply2) Save(id bson.ObjectId) bool {
 	if err != nil {
 		log.Println(err)
 		return false
-	}
+	}     
 	return true
 }
 
@@ -156,6 +154,8 @@ func (p *Post) Del(tid bson.ObjectId, name string) bool {
 		c.Remove(bson.M{"tid": tid})
 		c = session.DB(config.DbName).C("bbs_zhiding")
 		c.Remove(bson.M{"tid": tid})
+		c = session.DB(config.DbName).C("bbs_topics")
+		c.Update(bson.M{"name": p.ShareMsg.Topic}, bson.M{"$inc": bson.M{"num": -1}})
 		return true
 	}
 	return false

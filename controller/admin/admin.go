@@ -206,10 +206,10 @@ func SendGiftPack(c *gin.Context) {
 	c.String(http.StatusOK, "ok")
 }
 
-// AddGame .
-func AddGame(c *gin.Context) {
-	game := &model.Game{}
-	if err := c.Bind(game); err != nil {
+// AddTopic .
+func AddTopic(c *gin.Context) {
+	topic := &model.Topic{}
+	if err := c.Bind(topic); err != nil {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
@@ -217,16 +217,16 @@ func AddGame(c *gin.Context) {
 		enc  = base64.StdEncoding
 		path string
 	)
-	var img = game.ImgURL
+	var img = topic.ImgURL
 	if img[11] == 'j' {
 		img = img[23:]
-		path = fmt.Sprintf("/img/%s.jpg", game.Name)
+		path = fmt.Sprintf("/img/%s.jpg", topic.Name)
 	} else if img[11] == 'p' {
 		img = img[22:]
-		path = fmt.Sprintf("/img/%s.png", game.Name)
+		path = fmt.Sprintf("/img/%s.png", topic.Name)
 	} else if img[11] == 'g' {
 		img = img[22:]
-		path = fmt.Sprintf("/img/%s.gif", game.Name)
+		path = fmt.Sprintf("/img/%s.gif", topic.Name)
 	} else {
 		fmt.Println("不支持该文件类型")
 	}
@@ -243,8 +243,8 @@ func AddGame(c *gin.Context) {
 	}
 	//记录图片保存的地址
 	path = "http://www.yinghuo2018.com" + path
-	game.ImgURL = path
-	if err := game.Save(); err != nil {
+	topic.ImgURL = path
+	if err := topic.Save(); err != nil {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}

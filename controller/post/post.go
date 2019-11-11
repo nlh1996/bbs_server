@@ -80,7 +80,11 @@ func Publish(c *gin.Context) {
 
 // GetPosts 获取所有贴子
 func GetPosts(c *gin.Context) {
-	model.UpdatePosts(common.PostsPool)
+	topic := c.Query("topic")
+	if err := model.UpdatePosts(common.PostsPool, topic); err != nil {
+		c.String(500, err.Error())
+		return
+	}
 	topStoreys := []model.TopStorey{}
 	for _, value := range *common.PostsPool {
 		topStoreys = append(topStoreys, value.TopStorey)
