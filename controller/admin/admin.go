@@ -4,9 +4,11 @@ import (
 	"bbs_server/common"
 	"bbs_server/model"
 	"bbs_server/utils"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -199,6 +201,51 @@ func SendGiftPack(c *gin.Context) {
 	}
 	if err := gift.Save(); err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.String(http.StatusOK, "ok")
+}
+
+// AddGame .
+func AddGame(c *gin.Context) {
+	game := &model.Game{}
+	if err := c.Bind(game); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	var (
+		enc  = base64.StdEncoding
+		path string
+	)
+	var img = game.ImgURL
+	if img[11] == 'j' {
+		img = img[23:]
+		path = fmt.Sprintf("/img/%s.jpg", game.Name)
+	} else if img[11] == 'p' {
+		img = img[22:]
+		path = fmt.Sprintf("/img/%s.png", game.Name)
+	} else if img[11] == 'g' {
+		img = img[22:]
+		path = fmt.Sprintf("/img/%s.gif", game.Name)
+	} else {
+		fmt.Println("不支持该文件类型")
+	}
+
+	data, err := enc.DecodeString(img)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	// 图片写入文件
+	f, _ := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModePerm)
+	defer f.Close()
+	if _, err := f.Write(data); err != nil {
+		log.Println(err)
+	}
+	//记录图片保存的地址
+	path = "http://www.yinghuo2018.com" + path
+	game.ImgURL = path
+	if err := game.Save(); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
 	c.String(http.StatusOK, "ok")

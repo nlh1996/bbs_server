@@ -6,6 +6,7 @@ import (
 	"bbs_server/utils"
 	"encoding/base64"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -53,7 +54,9 @@ func Publish(c *gin.Context) {
 			// 图片写入文件
 			f, _ := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModePerm)
 			defer f.Close()
-			f.Write(data)
+			if _, err := f.Write(data); err != nil {
+				log.Println(err)
+			}
 			//记录图片保存的地址
 			path = "http://www.yinghuo2018.com" + path
 			topStorey.ImgList[index] = path
@@ -70,7 +73,7 @@ func Publish(c *gin.Context) {
 		name.UName = topStorey.UName
 		name.SaveMyPost(topStorey.TID.Hex())
 		c.String(http.StatusOK, "success")
-	}else {
+	} else {
 		c.String(http.StatusOK, "未能成功保存")
 	}
 }
@@ -84,7 +87,7 @@ func GetPosts(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"posts": topStoreys,
-		"msg": "scessue",
+		"msg":   "scessue",
 	})
 }
 
@@ -95,9 +98,9 @@ func GetPost(c *gin.Context) {
 	if post.Get(bson.ObjectIdHex(tid)) {
 		c.JSON(http.StatusOK, gin.H{
 			"post": *post,
-			"msg": "success",
+			"msg":  "success",
 		})
-	}else {
+	} else {
 		c.String(http.StatusOK, "error,未正确获取到贴子!")
 	}
 }
@@ -116,7 +119,7 @@ func Reply1(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"reply": *reply1,
 		})
-	}else {
+	} else {
 		c.String(http.StatusOK, "内部错误")
 	}
 }
@@ -135,7 +138,7 @@ func Reply2(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"reply": *reply2,
 		})
-	}else {
+	} else {
 		c.String(http.StatusOK, "内部错误")
 	}
 }
@@ -148,12 +151,12 @@ func DelPost(c *gin.Context) {
 		fmt.Println(err.Error())
 		return
 	}
-	if post.Del(post.TID,name) {
+	if post.Del(post.TID, name) {
 		user := &model.User{}
 		user.UName = name
 		user.DelMyPost(post.TID.Hex())
 		c.String(http.StatusOK, "删除成功")
-	}else {
+	} else {
 		c.String(http.StatusOK, "删除失败")
 	}
 }
@@ -172,14 +175,14 @@ func Support(c *gin.Context) {
 	// 被点赞贴子，增加点赞数
 	post.TID = bson.ObjectIdHex(tid)
 	post.AddSupport()
-	c.String(http.StatusOK,"")
+	c.String(http.StatusOK, "")
 }
 
 // Cancel 取消赞
 func Cancel(c *gin.Context) {
 	// 点赞用户，删除点赞的帖子
 	name := &model.User{}
-	post := &model.Post{}        
+	post := &model.Post{}
 	name.UName = c.Request.Header["Authorization"][0]
 	tid := c.PostForm("tid")
 	name.DelSupport(tid)
@@ -190,4 +193,3 @@ func Cancel(c *gin.Context) {
 	post.TID = bson.ObjectIdHex(tid)
 	post.ReduceSupport()
 }
-

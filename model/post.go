@@ -51,6 +51,8 @@ type ShareMsg struct {
 	CreateTime string        `json:"createTime"`
 	Content    string        `json:"content"`
 	TID        bson.ObjectId `json:"tid"`
+	Type       int           `json:"type"`
+	Tag        int           `json:"tag"`
 }
 
 // HeadPost 置顶帖

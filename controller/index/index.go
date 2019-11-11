@@ -21,3 +21,15 @@ func GetInfo(c *gin.Context) {
 		"data": *topic,
 	})
 }
+
+// GetGames .
+func GetGames(c *gin.Context) {
+	games := &[]model.Game{}
+	if err := model.GetGames(games); err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"games": *games,
+	})
+}
