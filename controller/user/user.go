@@ -156,8 +156,7 @@ func ShowGiftPack(c *gin.Context) {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
-	filter := bson.M{"channel": gift.Channel, "area": gift.Area}
-	res, err := gift.Search(filter)
+	res, err := gift.Search(nil)
 	if err != nil {
 		c.String(http.StatusAccepted, err.Error())
 		return
@@ -175,7 +174,7 @@ func GetGiftPack(c *gin.Context) {
 		return
 	}
 	code := &model.RedeemCode{}
-	filter := bson.M{"channel": gift.Channel, "area": gift.Area, "giftpackname": gift.GiftPackName, "geted": false}
+	filter := bson.M{"giftpackname": gift.GiftPackName, "geted": false}
 	if err := code.FindOne(filter); err != nil {
 		log.Println(err)
 		c.String(http.StatusBadRequest, err.Error())

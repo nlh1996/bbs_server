@@ -81,11 +81,11 @@ func (p *Post) Save() bool {
 }
 
 // UpdatePosts 获取所有贴子.
-func UpdatePosts(postsPool *[]Post, topic string) error {
+func UpdatePosts(postsPool *[]Post, topic string, Type int) error {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB(config.DbName).C("bbs_posts")
-	return c.Find(bson.M{"topstorey.topic": topic}).Sort("-_id").All(postsPool)
+	return c.Find(bson.M{"topstorey.topic": topic, "topstorey.type": Type}).Sort("-_id").All(postsPool)
 }
 
 // Get 获取单个贴子详情.

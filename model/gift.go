@@ -10,8 +10,8 @@ import (
 
 // Gift .
 type Gift struct {
-	Channel      string
-	Area         string
+	Comment      string
+	Jifen        int	
 	GiftPackName string
 	GiftPackNum  int
 }
@@ -48,7 +48,17 @@ func (g *Gift) Search(filter interface{}) (*[]Gift, error) {
 	defer session.Close()
 	c := session.DB(config.DbName).C("bbs_gift")
 	res := &[]Gift{}
-	return res, c.Find(filter).All(res)
+	err := c.Find(filter).All(res)
+	return res, err
+}
+
+// Del .
+func (g *Gift) Del(filter interface{}) (error) {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB(config.DbName).C("bbs_gift")
+	err := c.Remove(filter)
+	return err
 }
 
 // FindOne .
@@ -67,8 +77,8 @@ func (g *Gift) Update() error {
 	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB(config.DbName).C("bbs_gift")
-	filter := bson.M{"channel": g.Channel, "area": g.Area, "giftpackname": g.GiftPackName}
-	err :=  c.Update(filter, bson.M{"$inc": bson.M{"giftpacknum": -1}})
+	filter := bson.M{"giftpackname": g.GiftPackName}
+	err := c.Update(filter, bson.M{"$inc": bson.M{"giftpacknum": -1}})
 	mx.Unlock()
 	return err
 }

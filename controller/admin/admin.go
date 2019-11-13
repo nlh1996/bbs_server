@@ -194,7 +194,7 @@ func SendGiftPack(c *gin.Context) {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
-	filter := bson.M{"channel": gift.Channel, "area": gift.Area, "giftpackname": gift.GiftPackName}
+	filter := bson.M{"giftpackname": gift.GiftPackName}
 	if err := gift.FindOne(filter); err == nil {
 		c.String(http.StatusBadRequest, "请不要重复发送该礼包！")
 		return
@@ -204,6 +204,36 @@ func SendGiftPack(c *gin.Context) {
 		return
 	}
 	c.String(http.StatusOK, "ok")
+}
+
+// GetGiftPacks .
+func GetGiftPacks(c *gin.Context) {
+	gift := &model.Gift{}
+	res, err := gift.Search(nil)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"msg": "ok",
+		"gifts": res,
+	})
+}
+
+// DelGiftPack .
+func DelGiftPack(c *gin.Context) {
+	gift := &model.Gift{}
+	if err := c.Bind(gift); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	filter := bson.M{"giftpackname": gift.GiftPackName}
+	err := gift.Del(filter)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.String(http.StatusOK, "del ok")
 }
 
 // AddTopic .

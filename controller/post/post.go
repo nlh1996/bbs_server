@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gopkg.in/mgo.v2/bson"
@@ -19,7 +20,7 @@ func Publish(c *gin.Context) {
 	post := &model.Post{}
 	topStorey := &post.TopStorey
 	if err := c.Bind(topStorey); err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 		return
 	}
 
@@ -49,7 +50,7 @@ func Publish(c *gin.Context) {
 
 			data, err := enc.DecodeString(img)
 			if err != nil {
-				fmt.Println(err.Error())
+				log.Println(err.Error())
 			}
 			// 图片写入文件
 			f, _ := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModePerm)
@@ -81,7 +82,8 @@ func Publish(c *gin.Context) {
 // GetPosts 获取所有贴子
 func GetPosts(c *gin.Context) {
 	topic := c.Query("topic")
-	if err := model.UpdatePosts(common.PostsPool, topic); err != nil {
+	Type,_ := strconv.Atoi(c.Query("type"))
+	if err := model.UpdatePosts(common.PostsPool, topic, Type); err != nil {
 		c.String(500, err.Error())
 		return
 	}
@@ -152,7 +154,7 @@ func DelPost(c *gin.Context) {
 	name := c.Request.Header["Authorization"][0]
 	post := &model.Post{}
 	if err := c.Bind(post); err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 		return
 	}
 	if post.Del(post.TID, name) {
