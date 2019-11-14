@@ -233,7 +233,7 @@ func DelGiftPack(c *gin.Context) {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.String(http.StatusOK, "del ok")
+	c.String(http.StatusOK, "删除成功")
 }
 
 // AddTopic .
@@ -279,4 +279,29 @@ func AddTopic(c *gin.Context) {
 		return
 	}
 	c.String(http.StatusOK, "ok")
+}
+
+// CountRedeemCodes .
+func CountRedeemCodes(c *gin.Context) {
+	rc := new(model.RedeemCode)
+	if err := c.Bind(rc); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	filter := bson.M{
+		"giftpackname":   rc.GiftPackName,
+		"used":           false,
+		"geted":					false,
+		"fullserviceuse": true,
+		"unlimituse":     false,
+	}
+	num, err := rc.Count(filter)
+	if err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"msg":   "ok",
+		"count": num,
+	})
 }

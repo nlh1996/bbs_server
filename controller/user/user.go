@@ -152,10 +152,6 @@ func GetMyPosts(c *gin.Context) {
 // ShowGiftPack .
 func ShowGiftPack(c *gin.Context) {
 	gift := &model.Gift{}
-	if err := c.Bind(gift); err != nil {
-		c.String(http.StatusBadRequest, err.Error())
-		return
-	}
 	res, err := gift.Search(nil)
 	if err != nil {
 		c.String(http.StatusAccepted, err.Error())
@@ -181,19 +177,28 @@ func GetGiftPack(c *gin.Context) {
 		return
 	}
 
-	filter = bson.M{"$set": bson.M{"geted": true}}
+	filter = bson.M{"$set": bson.M{"geted": true, "fullserviceuse": true}}
 	if err := code.Update(filter); err != nil {
 		log.Println(err)
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
-	
+
 	if err := gift.Update(); err != nil {
 		log.Println(err)
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-	})
+	myGift := &model.MyGift{}
+	myGift.GiftPackName = gift.GiftPackName
+	myGift.Code = code.Code
+	user := &model.User{}
+	user.UName = c.Request.Header["Authorization"][0]
+	filter = bson.M{"uname": user.UName}
+	update := bson.M{"$push": bson.M{"mygifts": myGift}}
+	if err := user.Update(filter, update); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	c.String(http.StatusOK, "ok")
 }

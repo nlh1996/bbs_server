@@ -24,6 +24,7 @@ type User struct {
 	MyPosts    []string `json:"myPosts"`
 	MyCollect  []string `json:"myCollect"`
 	MySupport  []string `json:"mySupport"`
+	MyGifts    []MyGift `json:"myGifts"`
 	// lastLoginAt string
 }
 
@@ -138,6 +139,14 @@ func (pUser *User) SaveMyPost(tid string) bool {
 		return false
 	}
 	return true
+}
+
+// Update 修改用户信息
+func (pUser *User) Update(filter interface{}, update interface{}) error {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB(config.DbName).C("bbs_user")
+	return c.Update(filter, update)
 }
 
 // AddSupport 点赞数增加

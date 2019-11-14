@@ -65,6 +65,7 @@ func Init() {
 		adminAPI.POST("/sendGiftPack", admin.SendGiftPack)
 		adminAPI.POST("/getGiftPacks", admin.GetGiftPacks)
 		adminAPI.POST("/delGiftPack", admin.DelGiftPack)
+		adminAPI.POST("/countRedeemCodes", admin.CountRedeemCodes)
 		adminAPI.POST("/addTopic", admin.AddTopic)
 	}
 	//router.RunTLS(":8000", "./ssl/1_www.yinghuo2018.com_bundle.crt", "./ssl/2_www.yinghuo2018.com.key")
