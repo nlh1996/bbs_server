@@ -16,7 +16,7 @@ func Init() {
 	router := gin.Default()
 	// CrossDomain跨域处理，options请求处理
 	router.Use(middleware.CrossDomain())
-	// router.Use(middleware.TlsHandler())
+	//router.Use(middleware.TlsHandler())
 	// v1群组对任何人开放
 	v1 := router.Group("/v1")
 	{

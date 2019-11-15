@@ -57,7 +57,7 @@ func Register(c *gin.Context) {
 		msg.RegisterSave()
 		c.String(http.StatusOK, "Register successful !!!")
 	} else {
-		c.String(http.StatusOK, "用户名存在！")
+		c.String(http.StatusAccepted, "用户名存在！")
 	}
 }
 
@@ -194,6 +194,11 @@ func GetGiftPack(c *gin.Context) {
 	myGift.Code = code.Code
 	user := &model.User{}
 	user.UName = c.Request.Header["Authorization"][0]
+	user.Integral = gift.Jifen
+	if err := user.ReduceIntegral(); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
 	filter = bson.M{"uname": user.UName}
 	update := bson.M{"$push": bson.M{"mygifts": myGift}}
 	if err := user.Update(filter, update); err != nil {

@@ -11,7 +11,7 @@ import (
 // Gift .
 type Gift struct {
 	Comment      string
-	Jifen        int
+	Jifen        uint32
 	GiftPackName string
 	GiftPackNum  int
 }

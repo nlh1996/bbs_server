@@ -199,6 +199,14 @@ func (pUser *User) ReduceSupport() bool {
 	return true
 }
 
+// ReduceIntegral .
+func (pUser *User) ReduceIntegral() error {
+	session := database.Session.Clone()
+	defer session.Close()
+	c := session.DB(config.DbName).C("bbs_user")
+	return c.Update(bson.M{"uname": pUser.UName}, bson.M{"$inc": bson.M{"integral": -pUser.Integral}})
+}
+
 // Myposts .
 func (pUser *User) Myposts() *[]Mypost {
 	session := database.Session.Clone()
