@@ -59,7 +59,7 @@ func Publish(c *gin.Context) {
 				log.Println(err)
 			}
 			//记录图片保存的地址
-			path = "http://www.yinghuo2018.com" + path
+			path = "https://www.yinghuo2018.com" + path
 			topStorey.ImgList[index] = path
 		}
 	}

@@ -93,7 +93,7 @@ var mutex = sync.Mutex{}
 // FindOne .
 func (code *RedeemCode) FindOne(filter interface{}) error {
 	mutex.Lock()
-	session := database.Session2.Clone()
+	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB(config.GM).C("code")
 	err := c.Find(filter).One(code)
@@ -103,7 +103,7 @@ func (code *RedeemCode) FindOne(filter interface{}) error {
 
 // Update .
 func (code *RedeemCode) Update(filter interface{}) error {
-	session := database.Session2.Clone()
+	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB(config.GM).C("code")
 	return c.Update(bson.M{"_id": code.Code}, filter)
@@ -111,7 +111,7 @@ func (code *RedeemCode) Update(filter interface{}) error {
 
 // Count .
 func (rc *RedeemCode) Count(filter interface{}) (int, error) {
-	session := database.Session2.Clone()
+	session := database.Session.Clone()
 	defer session.Close()
 	c := session.DB(config.GM).C("code")
 	return c.Find(filter).Count()

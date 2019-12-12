@@ -71,3 +71,4 @@ func Init() {
 	//router.RunTLS(":8000", "./ssl/1_www.yinghuo2018.com_bundle.crt", "./ssl/2_www.yinghuo2018.com.key")
 	router.Run(":8000")
 }
+                                                         
